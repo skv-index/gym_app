@@ -1,0 +1,3542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PulseFit PRO - Workout & Fitness Tracker</title>
+    <style>
+        /* ==========================================
+       DESIGN TOKENS & SYSTEM VARIABLES
+       ========================================== */
+        :root {
+            /* Color Palette */
+            --bg-base: #06080F;
+            --bg-surface-1: rgba(18, 24, 38, 0.65);
+            --bg-surface-2: rgba(30, 40, 62, 0.5);
+            --bg-glass: rgba(255, 255, 255, 0.035);
+            --bg-glass-hover: rgba(255, 255, 255, 0.07);
+
+            /* Glass Borders & Highlights */
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-bright: rgba(255, 255, 255, 0.18);
+            --border-accent: rgba(139, 92, 246, 0.4);
+            --inset-glow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+
+            /* Vibrant Accents */
+            --accent-purple: #8B5CF6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.4);
+            --accent-cyan: #06B6D4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.35);
+            --accent-gold: #F59E0B;
+            --accent-gold-glow: rgba(245, 158, 11, 0.35);
+            --accent-pink: #EC4899;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+
+            /* Neutral Text Hierarchy */
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+            --text-muted: #475569;
+
+            /* UI Constants */
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+
+            --shadow-ambient: 0 20px 50px rgba(0, 0, 0, 0.6);
+            --shadow-glow-purple: 0 8px 32px rgba(139, 92, 246, 0.25);
+
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-fast: 0.2s;
+            --duration-normal: 0.35s;
+        }
+
+        /* ==========================================
+       RESET & BASE STYLES
+       ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #020305;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ==========================================
+       APP SHELL CONTAINER (MOBILE VIEWPORT)
+       ========================================== */
+        .app-shell {
+            width: 100%;
+            max-width: 390px;
+            height: 100vh;
+            max-height: 844px;
+            background: var(--bg-base);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-ambient), 0 0 0 12px #111522;
+            border-radius: 0px;
+        }
+
+        @media (min-height: 700px) and (min-width: 400px) {
+            .app-shell {
+                height: 92vh;
+                border-radius: 44px;
+            }
+        }
+
+        /* Ambient Background Light Orbs */
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+            animation: pulseOrb 8s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 260px;
+            height: 260px;
+            background: var(--accent-purple);
+            top: -60px;
+            right: -40px;
+        }
+
+        .orb-2 {
+            width: 220px;
+            height: 220px;
+            background: var(--accent-cyan);
+            bottom: 120px;
+            left: -50px;
+            opacity: 0.3;
+        }
+
+        @keyframes pulseOrb {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.15) translate(15px, 20px);
+            }
+        }
+
+        /* ==========================================
+       HEADER
+       ========================================== */
+        .app-header {
+            position: relative;
+            z-index: 10;
+            padding: 24px 24px 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: var(--radius-full);
+            background: var(--bg-surface-1);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--inset-glow);
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.92);
+            background: var(--bg-surface-2);
+        }
+
+        .icon-btn.gold-badge {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--accent-gold);
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.2), var(--inset-glow);
+        }
+
+        /* ==========================================
+       MAIN SCROLL AREA & TAB VIEWS
+       ========================================== */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 20px 110px 20px;
+            position: relative;
+            z-index: 5;
+            scrollbar-width: none;
+        }
+
+        .app-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-view {
+            display: none;
+            animation: viewFadeIn 0.3s var(--ease-spring);
+        }
+
+        .tab-view.active {
+            display: block;
+        }
+
+        @keyframes viewFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==========================================
+       PROFILE PAGE STYLES (PRESERVED)
+       ========================================== */
+        .profile-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: var(--inset-glow), 0 12px 30px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .profile-card:active {
+            transform: scale(0.98);
+            border-color: var(--border-glass-bright);
+        }
+
+        .profile-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 58px;
+            height: 58px;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            border: 2px solid var(--accent-purple);
+            box-shadow: var(--shadow-glow-purple);
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: #10B981;
+            border: 2.5px solid #06080F;
+            border-radius: var(--radius-full);
+        }
+
+        .profile-meta .username {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-icon {
+            color: var(--accent-cyan);
+        }
+
+        .profile-meta .workouts-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chevron-icon {
+            color: var(--text-tertiary);
+            transition: transform var(--duration-fast);
+        }
+
+        .profile-card:hover .chevron-icon {
+            transform: translateX(3px);
+            color: var(--text-primary);
+        }
+
+        .dashboard-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .dashboard-title-row h2 {
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid var(--border-accent);
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .add-btn:active {
+            transform: scale(0.9);
+            background: var(--accent-purple);
+            color: #FFF;
+        }
+
+        .widgets-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(22, 28, 45, 0.6) 0%, rgba(13, 17, 28, 0.7) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--inset-glow), 0 16px 36px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: cardSlideUp 0.4s var(--ease-spring);
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .widget-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .menu-dots-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 6px;
+            margin: -6px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color var(--duration-fast);
+        }
+
+        .menu-dots-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .chart-box {
+            height: 165px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-top: 20px;
+        }
+
+        .chart-y-axis {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .chart-y-axis span {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .chart-grid {
+            position: absolute;
+            top: 6px;
+            left: 0;
+            right: 20px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .grid-line {
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-bars-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 110px;
+            padding-right: 24px;
+            z-index: 2;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .bar-track {
+            width: 14px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 3px;
+            position: relative;
+        }
+
+        .bar-segment {
+            width: 100%;
+            background: linear-gradient(180deg, var(--accent-purple) 0%, rgba(139, 92, 246, 0.6) 100%);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--accent-purple-glow);
+            transition: height 0.8s var(--ease-spring), transform var(--duration-fast);
+            height: 0%;
+        }
+
+        .bar-group:hover .bar-segment {
+            transform: scaleX(1.2);
+            filter: brightness(1.2);
+        }
+
+        .bar-date {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+
+        .goal-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            color: var(--accent-cyan);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            margin-bottom: 12px;
+        }
+
+        .big-metric {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .big-metric span {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+            transition: width 0.8s var(--ease-spring);
+        }
+
+        .macro-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .macro-card-box {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .macro-card-box .label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .macro-card-box .val {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* ==========================================
+       HISTORY PAGE SPECIFIC STYLES
+       ========================================== */
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 0 38px 0 42px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all var(--duration-fast);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-purple);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 16px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            pointer-events: none;
+        }
+
+        .search-clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-secondary);
+            border-radius: var(--radius-full);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-fast);
+        }
+
+        .search-clear-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Filter Pills & Sorting Scroll */
+        .filter-sort-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            scrollbar-width: none;
+        }
+
+        .filter-sort-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-pill.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--accent-purple);
+            color: var(--text-primary);
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+        }
+
+        .sort-select-wrapper {
+            position: relative;
+            min-height: 36px;
+        }
+
+        .sort-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-full);
+            padding: 8px 30px 8px 14px;
+            color: var(--accent-cyan);
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            height: 36px;
+        }
+
+        .sort-select-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-cyan);
+            pointer-events: none;
+        }
+
+        /* Month Grouping & Workout Glass Cards */
+        .month-group {
+            margin-bottom: 24px;
+        }
+
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .month-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            color: var(--text-primary);
+        }
+
+        .month-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-glass);
+        }
+
+        .workout-card {
+            background: linear-gradient(135deg, rgba(22, 28, 45, 0.65) 0%, rgba(13, 17, 28, 0.75) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--inset-glow), 0 14px 32px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+            animation: cardSlideUp 0.35s var(--ease-spring);
+        }
+
+        .workout-card:active {
+            transform: scale(0.98);
+            border-color: var(--border-glass-bright);
+            background: rgba(30, 40, 62, 0.8);
+        }
+
+        .workout-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .workout-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+            margin-bottom: 3px;
+        }
+
+        .workout-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .pr-tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: var(--accent-gold);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+        }
+
+        /* Exercise summary inside cards */
+        .workout-sets-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .sets-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .exercise-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .exercise-summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .exercise-name-sets {
+            color: var(--text-primary);
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 65%;
+        }
+
+        .exercise-best-set {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        /* Bottom stats row on card */
+        .workout-stats-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-item-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .stat-item-inline svg {
+            color: var(--text-tertiary);
+        }
+
+        .stat-item-inline.prs svg {
+            color: var(--accent-gold);
+        }
+
+        /* Empty State */
+        .empty-history-state {
+            text-align: center;
+            padding: 48px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--border-glass);
+            border-radius: var(--radius-xl);
+            margin-top: 20px;
+        }
+
+        .empty-icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-full);
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+        }
+
+        .empty-history-state h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .empty-history-state p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            max-width: 240px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        /* Calendar Bottom Sheet Component */
+        .calendar-grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .calendar-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .calendar-month-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .calendar-days-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .calendar-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .cal-day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--duration-fast);
+        }
+
+        .cal-day-cell.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .cal-day-cell:not(.empty):active {
+            transform: scale(0.9);
+        }
+
+        .cal-day-cell.has-workout {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--text-primary);
+        }
+
+        .cal-workout-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: var(--radius-full);
+            background: var(--accent-cyan);
+            box-shadow: 0 0 6px var(--accent-cyan);
+            margin-top: 2px;
+        }
+
+        .cal-day-cell.selected {
+            background: var(--accent-purple) !important;
+            color: #FFF !important;
+            box-shadow: var(--shadow-glow-purple);
+        }
+
+        .cal-day-cell.selected .cal-workout-dot {
+            background: #FFF;
+        }
+
+        /* Detailed Workout Sheet Components */
+        .workout-detail-header {
+            margin-bottom: 20px;
+        }
+
+        .workout-detail-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .workout-detail-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .workout-detail-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .detail-stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .detail-stat-box .val {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .detail-stat-box .lbl {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+        }
+
+        .exercise-detail-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .exercise-detail-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-set-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .exercise-set-row:last-child {
+            border-bottom: none;
+        }
+
+        .set-num {
+            color: var(--text-tertiary);
+            font-weight: 600;
+            width: 50px;
+        }
+
+        .set-weight-reps {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .pr-star {
+            color: var(--accent-gold);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .workout-notes-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        /* ==========================================
+       PAGE 3: WORKOUT SPECIFIC STYLES
+       ========================================== */
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+        }
+
+        .header-actions-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-fast);
+        }
+
+        .icon-btn-sm:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-start-empty {
+            width: 100%;
+            height: 52px;
+            min-height: 52px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #7C3AED 100%);
+            border: none;
+            color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: var(--shadow-glow-purple), var(--inset-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .btn-start-empty:active {
+            transform: scale(0.97);
+            filter: brightness(0.95);
+        }
+
+        /* Folder Filter Pill Bar */
+        .folder-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+
+        .folder-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .folder-pill {
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all var(--duration-fast);
+        }
+
+        .folder-pill.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: var(--accent-purple);
+            color: var(--text-primary);
+        }
+
+        /* Template Cards Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 360px) {
+            .template-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+        }
+
+        .template-card {
+            background: linear-gradient(135deg, rgba(22, 28, 45, 0.6) 0%, rgba(13, 17, 28, 0.7) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--inset-glow);
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .template-card.example-card {
+            border-style: dashed;
+            background: linear-gradient(135deg, rgba(15, 20, 32, 0.4) 0%, rgba(10, 14, 24, 0.5) 100%);
+        }
+
+        .template-card:active {
+            transform: scale(0.98);
+            border-color: var(--border-glass-bright);
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .template-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+            padding-right: 4px;
+        }
+
+        .template-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            flex: 1;
+        }
+
+        .template-meta {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Active Workout Screen Overlay */
+        .active-workout-modal {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-base);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform var(--duration-normal) var(--ease-spring);
+        }
+
+        .active-workout-modal.open {
+            transform: translateY(0);
+        }
+
+        .active-workout-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(18, 24, 38, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .timer-badge-display {
+            font-size: 18px;
+            font-weight: 800;
+            font-mono: tabular-nums;
+            color: var(--accent-cyan);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-finish-workout {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%);
+            border: none;
+            color: #FFF;
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .active-workout-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 120px 20px;
+            scrollbar-width: none;
+        }
+
+        .active-workout-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .active-summary-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .active-stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .active-stat-card .val {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .active-stat-card .lbl {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Active Exercise Card & Mobile Set Rows */
+        .active-ex-card {
+            background: rgba(22, 28, 45, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .active-ex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .active-ex-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-purple);
+        }
+
+        .set-table-header {
+            display: grid;
+            grid-template-columns: 36px 1fr 1fr 1fr 40px;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .set-row-item {
+            display: grid;
+            grid-template-columns: 36px 1fr 1fr 1fr 40px;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            transition: all var(--duration-fast);
+        }
+
+        .set-row-item.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .set-num-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .prev-val {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .set-input-num {
+            width: 100%;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .set-input-num:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .check-btn-set {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-fast);
+            margin: 0 auto;
+        }
+
+        .set-row-item.completed .check-btn-set {
+            background: var(--accent-green);
+            color: #FFF;
+            border-color: var(--accent-green);
+        }
+
+        .btn-add-set {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed var(--border-glass);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        /* Floating Rest Timer Bar */
+        .rest-timer-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            background: rgba(18, 24, 38, 0.95);
+            border: 1px solid var(--accent-cyan);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-full);
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+            z-index: 550;
+            transform: translateY(150%);
+            transition: transform var(--duration-normal) var(--ease-spring);
+        }
+
+        .rest-timer-bar.visible {
+            transform: translateY(0);
+        }
+
+        .timer-time-text {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-mono: tabular-nums;
+        }
+
+        .timer-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================
+       FLOATING GLASS BOTTOM NAVIGATION DOCK
+       ========================================== */
+        .bottom-nav-dock {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            height: 68px;
+            background: rgba(15, 20, 32, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass-bright);
+            border-radius: var(--radius-full);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 100;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), var(--inset-glow);
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            width: 58px;
+            padding: 8px 0;
+            position: relative;
+            transition: color var(--duration-fast);
+        }
+
+        .nav-tab svg {
+            transition: transform var(--duration-fast) var(--ease-spring), color var(--duration-fast);
+        }
+
+        .nav-tab span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+        }
+
+        .nav-tab.active {
+            color: var(--accent-purple);
+        }
+
+        .nav-tab.active svg {
+            transform: translateY(-2px);
+            color: var(--accent-purple);
+        }
+
+        .active-dot {
+            position: absolute;
+            bottom: 6px;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-purple);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        /* ==========================================
+       MODALS & BOTTOM SHEETS
+       ========================================== */
+        .sheet-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 4, 8, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-normal) var(--ease-spring);
+        }
+
+        .sheet-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet-drawer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0E1322;
+            border-top: 1px solid var(--border-glass-bright);
+            border-radius: 32px 32px 0 0;
+            padding: 12px 24px 36px 24px;
+            z-index: 201;
+            transform: translateY(100%);
+            transition: transform var(--duration-normal) var(--ease-spring);
+            box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
+            max-height: 82vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .bottom-sheet-drawer::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sheet-overlay.active .bottom-sheet-drawer {
+            transform: translateY(0);
+        }
+
+        .drag-pill {
+            width: 38px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-full);
+            margin: 0 auto 20px auto;
+        }
+
+        .sheet-header-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        /* Form Fields */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .text-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: border-color var(--duration-fast);
+        }
+
+        .text-input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .primary-action-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #7C3AED 100%);
+            color: #FFF;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-glow-purple);
+            transition: all var(--duration-fast) var(--ease-spring);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .primary-action-btn:active {
+            transform: scale(0.98);
+            filter: brightness(0.9);
+        }
+
+        /* Option Items in Sheets */
+        .option-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background var(--duration-fast);
+        }
+
+        .option-card:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .option-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .action-row-btn {
+            width: 100%;
+            padding: 15px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background var(--duration-fast);
+        }
+
+        .action-row-btn:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .action-row-btn.danger {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Confirm Modal Box */
+        .confirm-box {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .confirm-box p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .confirm-btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .danger-btn {
+            flex: 1;
+            padding: 14px;
+            background: var(--accent-red);
+            border: none;
+            border-radius: var(--radius-md);
+            color: #FFF;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Celebration Stats Container */
+        .celebration-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .celeb-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .celeb-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .celeb-lbl {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* Search Results Modal List */
+        .search-res-item {
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .search-res-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .search-res-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================
+       TOAST NOTIFICATION
+       ========================================== */
+        .floating-toast {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: rgba(30, 40, 60, 0.9);
+            border: 1px solid var(--border-glass-bright);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s var(--ease-spring);
+            white-space: nowrap;
+        }
+
+        .floating-toast.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- APP SHELL -->
+    <div class="app-shell">
+
+        <!-- Ambient Blur Lighting Orbs -->
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+
+        <!-- Floating Toast Capsule -->
+        <div id="app-toast" class="floating-toast">Coming next</div>
+
+        <!-- APP HEADER (DYNAMICALLY UPDATED BY ACTIVE TAB) -->
+        <header class="app-header">
+            <h1 id="page-title">Workout</h1>
+            <div class="header-actions" id="header-actions">
+                <!-- Dynamically populated per page -->
+            </div>
+        </header>
+
+        <!-- SCROLLABLE BODY CONTENT -->
+        <main class="app-content">
+
+            <!-- PAGE 1: PROFILE TAB -->
+            <div id="tab-profile" class="tab-view">
+                <!-- PROFILE IDENTITY CARD -->
+                <div class="profile-card" id="profile-trigger" aria-label="Edit Profile">
+                    <div class="profile-left">
+                        <div class="avatar-container">
+                            <img id="user-avatar-img"
+                                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250"
+                                alt="Avatar" class="avatar-img">
+                            <div class="status-indicator"></div>
+                        </div>
+                        <div class="profile-meta">
+                            <div class="username">
+                                <span id="user-name-txt">SKV</span>
+                                <svg class="verified-icon" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                                </svg>
+                            </div>
+                            <div class="workouts-count"><span id="user-workouts-txt">246</span> workouts</div>
+                        </div>
+                    </div>
+                    <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </div>
+
+                <!-- DASHBOARD SECTION -->
+                <div class="dashboard-title-row">
+                    <h2>Dashboard</h2>
+                    <button class="add-btn" id="open-add-widget-btn" aria-label="Add Widget">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- WIDGETS CONTAINER -->
+                <div class="widgets-stack" id="widgets-container">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- PAGE 2: HISTORY TAB -->
+            <div id="tab-history" class="tab-view">
+
+                <!-- SEARCH & SEARCH ACTIONS -->
+                <div class="search-container">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="history-search-input" class="search-input"
+                        placeholder="Search workout, exercise, date...">
+                    <button id="history-search-clear" class="search-clear-btn" aria-label="Clear Search">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- FILTER PILLS & SORTING ROW -->
+                <div class="filter-sort-row">
+                    <button class="filter-pill active" data-filter="all">All</button>
+                    <button class="filter-pill" data-filter="this-week">This week</button>
+                    <button class="filter-pill" data-filter="this-month">This month</button>
+                    <button class="filter-pill" data-filter="prev-month">Previous month</button>
+                    <button class="filter-pill" data-filter="prs">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16v-2H4v2zm2-13h12v3a6 6 0 0 1-12 0V9z" />
+                        </svg> PRs
+                    </button>
+                    <button class="filter-pill" data-filter="high-volume">Highest Volume</button>
+
+                    <div class="sort-select-wrapper">
+                        <select id="history-sort-select" class="sort-select">
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                            <option value="highest-vol">Highest volume</option>
+                            <option value="longest">Longest workout</option>
+                            <option value="most-prs">Most PRs</option>
+                        </select>
+                        <svg class="sort-select-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- CHRONOLOGICAL WORKOUT CONTAINER -->
+                <div id="workout-history-feed">
+                    <!-- Dynamic Month Groups & Cards rendered here -->
+                </div>
+
+            </div>
+
+            <!-- PAGE 3: WORKOUT TAB (ACTIVE TAB) -->
+            <div id="tab-workout" class="tab-view active">
+
+                <!-- Quick Start Section -->
+                <div class="section-header-row" style="margin-top:0;">
+                    <div class="section-title">Quick start</div>
+                </div>
+                <button class="btn-start-empty" onclick="app.startWorkout()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    START AN EMPTY WORKOUT
+                </button>
+
+                <!-- My Templates Header & Actions -->
+                <div class="section-header-row">
+                    <div class="section-title">Templates</div>
+                    <div class="header-actions-inline">
+                        <button class="icon-btn-sm" onclick="app.openCreateTemplateSheet()" title="Create Template">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn-sm" onclick="app.openFolderManagerSheet()" title="Folders">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </button>
+                        <button class="icon-btn-sm" onclick="app.openTemplateMenuSheet()" title="Template Menu">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <circle cx="12" cy="12" r="1" />
+                                <circle cx="19" cy="12" r="1" />
+                                <circle cx="5" cy="12" r="1" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Folder Filter Bar -->
+                <div class="folder-bar" id="template-folder-bar">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- My Templates Grid -->
+                <div class="template-grid" id="user-templates-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Example Templates Section -->
+                <div class="section-header-row">
+                    <div class="section-title">Example Templates (<span id="example-count-num">5</span>)</div>
+                </div>
+                <div class="template-grid" id="example-templates-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- FLOATING BOTTOM NAVIGATION DOCK -->
+        <nav class="bottom-nav-dock">
+            <button class="nav-tab" data-tab="profile">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Profile</span>
+            </button>
+            <button class="nav-tab" data-tab="history">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>History</span>
+            </button>
+            <button class="nav-tab active" data-tab="workout">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Workout</span>
+                <div class="active-dot"></div>
+            </button>
+            <button class="nav-tab" data-tab="exercises">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6.5 6.5 11 11" />
+                    <path d="m21 21-1-1" />
+                    <path d="m3 3 1 1" />
+                    <path d="m18 22 4-4" />
+                    <path d="m2 6 4-4" />
+                    <path d="m3 10 7-7" />
+                    <path d="m14 21 7-7" />
+                </svg>
+                <span>Exercises</span>
+            </button>
+            <button class="nav-tab" data-tab="measure">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0l12.6 12.6z" />
+                    <line x1="14.5" y1="12.5" x2="17" y2="10" />
+                    <line x1="11.5" y1="9.5" x2="14" y2="7" />
+                    <line x1="8.5" y1="6.5" x2="11" y2="4" />
+                </svg>
+                <span>Measure</span>
+            </button>
+        </nav>
+
+        <!-- ACTIVE WORKOUT FULL SCREEN OVERLAY -->
+        <div class="active-workout-modal" id="active-workout-screen">
+            <div class="active-workout-header">
+                <button class="icon-btn-sm" onclick="app.minimizeOrCancelActiveWorkout()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div>
+                    <div id="active-workout-title-txt" style="font-size:16px; font-weight:800; text-align:center;">
+                        Active Workout</div>
+                    <div class="timer-badge-display" style="justify-content:center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span id="active-timer-clock">00:00</span>
+                    </div>
+                </div>
+                <button class="btn-finish-workout" onclick="app.finishWorkout()">Finish</button>
+            </div>
+
+            <div class="active-workout-body">
+                <div class="active-summary-bar">
+                    <div class="active-stat-card">
+                        <div class="val" id="active-stat-volume">0 kg</div>
+                        <div class="lbl">Volume</div>
+                    </div>
+                    <div class="active-stat-card">
+                        <div class="val" id="active-stat-sets">0</div>
+                        <div class="lbl">Sets</div>
+                    </div>
+                    <div class="active-stat-card">
+                        <div class="val" id="active-stat-ex">0</div>
+                        <div class="lbl">Exercises</div>
+                    </div>
+                </div>
+
+                <div id="active-exercises-list">
+                    <!-- Dynamic Exercise Cards with set inputs -->
+                </div>
+
+                <button class="primary-action-btn"
+                    style="margin-top:16px; background: rgba(139,92,246,0.15); border:1px solid var(--border-accent); color:var(--accent-purple);"
+                    onclick="app.openExercisePickerForActive()">
+                    + Add Exercise
+                </button>
+                <button class="secondary-btn" style="width:100%; margin-top:10px;" onclick="app.promptAddActiveNote()">
+                    + Add Note
+                </button>
+            </div>
+
+            <!-- Floating Rest Timer Overlay Inside Active Screen -->
+            <div class="rest-timer-bar" id="rest-timer-bar">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)"
+                        stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span class="timer-time-text" id="rest-timer-val">00:30</span>
+                </div>
+                <div class="timer-controls-group">
+                    <button class="icon-btn-sm" onclick="app.addRestTimerTime(30)">+30s</button>
+                    <button class="icon-btn-sm" id="btn-pause-rest" onclick="app.toggleRestTimerPause()">Pause</button>
+                    <button class="icon-btn-sm" onclick="app.skipRestTimer()">Skip</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHEET OVERLAY & BACKDROP -->
+        <div class="sheet-overlay" id="sheet-backdrop">
+
+            <!-- EDIT PROFILE SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-edit-profile" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Edit Profile</div>
+                <form id="form-profile" onsubmit="event.preventDefault(); app.saveProfile();">
+                    <div class="input-group">
+                        <label class="input-label" for="field-username">Username</label>
+                        <input type="text" id="field-username" class="text-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="field-workouts">Total Workouts</label>
+                        <input type="number" id="field-workouts" class="text-input" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="field-avatar">Avatar Image URL</label>
+                        <input type="url" id="field-avatar" class="text-input" required>
+                    </div>
+                    <button type="submit" class="primary-action-btn">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- ADD WIDGET SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-add-widget" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Add Widget</div>
+                <div class="option-list" id="available-widgets-list">
+                    <!-- Dynamic widget options -->
+                </div>
+            </div>
+
+            <!-- WIDGET OPTIONS POPUP SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-widget-menu" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title" id="widget-menu-title">Widget Settings</div>
+                <button class="action-row-btn" onclick="app.openGoalModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    Add Goal
+                </button>
+                <button class="action-row-btn danger" onclick="app.deleteSelectedWidget()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Delete Widget
+                </button>
+            </div>
+
+            <!-- SET GOAL SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-set-goal" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Set Goal</div>
+                <form onsubmit="event.preventDefault(); app.saveGoal();">
+                    <div class="input-group">
+                        <label class="input-label" for="field-goal">Goal Description / Target</label>
+                        <input type="text" id="field-goal" class="text-input" placeholder="e.g. 4 workouts per week"
+                            required>
+                    </div>
+                    <button type="submit" class="primary-action-btn">Save Goal</button>
+                </form>
+            </div>
+
+            <!-- CALENDAR BOTTOM SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-calendar" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="calendar-nav-bar">
+                    <button class="icon-btn" onclick="app.navigateCalendar(-1)" aria-label="Previous Month">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                    </button>
+                    <div class="calendar-month-title" id="calendar-month-label">August 2026</div>
+                    <button class="icon-btn" onclick="app.navigateCalendar(1)" aria-label="Next Month">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="calendar-days-header">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                </div>
+                <div class="calendar-days-grid" id="calendar-days-container">
+                    <!-- Calendar days rendered here -->
+                </div>
+                <button class="primary-action-btn" style="margin-top:20px;" onclick="app.closeSheets()">Close
+                    Calendar</button>
+            </div>
+
+            <!-- WORKOUT DETAIL SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-workout-detail" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div id="workout-detail-content">
+                    <!-- Dynamic detailed workout contents -->
+                </div>
+            </div>
+
+            <!-- CREATE / EDIT TEMPLATE SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-create-template" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title" id="template-modal-title">Create Template</div>
+                <div class="input-group">
+                    <label class="input-label">Template Name</label>
+                    <input type="text" id="tpl-name-input" class="text-input" placeholder="e.g. Chest & Triceps">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Description / Folder</label>
+                    <input type="text" id="tpl-desc-input" class="text-input" placeholder="e.g. Hypertrophy focus">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Exercises</label>
+                    <div id="tpl-exercises-edit-list"
+                        style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
+                        <!-- Selected exercise items -->
+                    </div>
+                    <button class="secondary-btn" style="width:100%;" onclick="app.openExercisePickerForTemplate()">+
+                        Add Exercise</button>
+                </div>
+                <button class="primary-action-btn" onclick="app.saveTemplate()">Save Template</button>
+            </div>
+
+            <!-- EXERCISE PICKER SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-exercise-picker" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Select Exercise</div>
+                <div class="search-container">
+                    <input type="text" id="ex-picker-search" class="search-input" placeholder="Search exercises..."
+                        oninput="app.filterExercisePicker(this.value)">
+                </div>
+                <div class="option-list" id="exercise-picker-list" style="max-height: 40vh; overflow-y:auto;">
+                    <!-- Exercise options -->
+                </div>
+            </div>
+
+            <!-- WORKOUT SEARCH SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-workout-search" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Search Workout</div>
+                <div class="search-container">
+                    <input type="text" id="workout-search-input" class="search-input"
+                        placeholder="Search templates, exercises..."
+                        oninput="app.renderWorkoutSearchResults(this.value)">
+                </div>
+                <div id="workout-search-results-list" style="max-height: 50vh; overflow-y:auto; margin-top:10px;">
+                    <!-- Search Results -->
+                </div>
+            </div>
+
+            <!-- FOLDER MANAGER SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-folder-manager" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Template Folders</div>
+                <div class="input-group">
+                    <input type="text" id="new-folder-input" class="text-input" placeholder="New folder name">
+                    <button class="primary-action-btn" style="margin-top:8px;" onclick="app.addFolder()">Create
+                        Folder</button>
+                </div>
+                <div class="option-list" id="folders-list-container">
+                    <!-- Dynamic Folders -->
+                </div>
+            </div>
+
+            <!-- TEMPLATE MENU / SETTINGS SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-template-menu" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Template Options</div>
+                <button class="action-row-btn" onclick="app.sortTemplatesAlphabetical()">
+                    Sort Templates A-Z
+                </button>
+                <button class="action-row-btn" onclick="app.openFolderManagerSheet()">
+                    Manage Folders
+                </button>
+                <button class="action-row-btn danger" onclick="app.resetExampleTemplates()">
+                    Reset Example Templates
+                </button>
+            </div>
+
+            <!-- TEMPLATE CARD ACTION MENU SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-template-card-menu" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title" id="tpl-card-menu-title">Template Actions</div>
+                <div id="tpl-card-actions-body">
+                    <!-- Dynamic Action Rows -->
+                </div>
+            </div>
+
+            <!-- WORKOUT COMPLETE CELEBRATION SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-workout-complete" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div style="text-align:center;">
+                    <div style="font-size:36px; margin-bottom:4px;">🎉</div>
+                    <div class="sheet-header-title" style="margin-bottom:4px;">Workout Complete!</div>
+                    <p style="font-size:13px; color:var(--text-secondary);">Great job crushing your session!</p>
+                </div>
+
+                <div class="celebration-grid">
+                    <div class="celeb-card">
+                        <div class="celeb-val" id="celeb-time">0m</div>
+                        <div class="celeb-lbl">Duration</div>
+                    </div>
+                    <div class="celeb-card">
+                        <div class="celeb-val" id="celeb-vol">0 kg</div>
+                        <div class="celeb-lbl">Volume</div>
+                    </div>
+                    <div class="celeb-card">
+                        <div class="celeb-val" id="celeb-sets">0</div>
+                        <div class="celeb-lbl">Sets</div>
+                    </div>
+                    <div class="celeb-card">
+                        <div class="celeb-val" id="celeb-prs" style="color:var(--accent-gold)">0 PRs</div>
+                        <div class="celeb-lbl">Records</div>
+                    </div>
+                </div>
+
+                <button class="primary-action-btn" onclick="app.closeSheets()">Done</button>
+                <button class="secondary-btn" style="width:100%; margin-top:8px;"
+                    onclick="app.viewCompletedFromCelebration()">View Workout</button>
+            </div>
+
+            <!-- DELETE CONFIRMATION SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-delete-confirm" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Confirm Delete</div>
+                <div class="confirm-box">
+                    <p id="delete-confirm-msg">Are you sure you want to delete this item? This action cannot be undone.
+                    </p>
+                    <div class="confirm-btn-group">
+                        <button class="secondary-btn" onclick="app.closeSheets()">Cancel</button>
+                        <button class="danger-btn" onclick="app.executePendingDelete()">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const LOCAL_STORAGE_KEY = 'PULSE_FIT_PRO_APP_DATA_V3';
+
+        // Standalone HTML escaping utility
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+        }
+
+        // Standard Exercise Library
+        const EXERCISE_LIBRARY = [
+            'Overhead Press (Dumbbell)',
+            'Bench Dip',
+            'Bench Press (Barbell)',
+            'Reverse Fly (Dumbbell)',
+            'Bicep Curl (Dumbbell)',
+            'Goblet Squat (Kettlebell)',
+            'Step-up',
+            'Standing Calf Raise',
+            'Squat (Barbell)',
+            'Leg Extension (Machine)',
+            'Flat Dumbbell Fly',
+            'Lat Pulldown (Cable)',
+            'Deadlift (Barbell)',
+            'Incline Bench Press',
+            'Triceps Extension (Dumbbell)'
+        ];
+
+        // Initial User Templates
+        const INITIAL_USER_TEMPLATES = [
+            {
+                id: 'ut-1',
+                name: 'Push Workout',
+                folder: 'All',
+                lastUsed: 'Yesterday',
+                exercises: [
+                    { name: 'Overhead Press (Dumbbell)', sets: 3 },
+                    { name: 'Bench Dip', sets: 3 },
+                    { name: 'Bench Press (Barbell)', sets: 3 },
+                    { name: 'Incline Bench Press', sets: 3 }
+                ]
+            },
+            {
+                id: 'ut-2',
+                name: 'Pull Workout',
+                folder: 'All',
+                lastUsed: '3 days ago',
+                exercises: [
+                    { name: 'Reverse Fly (Dumbbell)', sets: 3 },
+                    { name: 'Bicep Curl (Dumbbell)', sets: 7 },
+                    { name: 'Lat Pulldown (Cable)', sets: 2 }
+                ]
+            },
+            {
+                id: 'ut-3',
+                name: 'Leg Workout',
+                folder: 'Legs',
+                lastUsed: '1 week ago',
+                exercises: [
+                    { name: 'Goblet Squat (Kettlebell)', sets: 4 },
+                    { name: 'Step-up', sets: 3 },
+                    { name: 'Standing Calf Raise', sets: 2 }
+                ]
+            }
+        ];
+
+        // Initial Example Templates
+        const INITIAL_EXAMPLE_TEMPLATES = [
+            {
+                id: 'et-1',
+                name: 'Strong 5x5 - Workout B',
+                exercises: [
+                    { name: 'Squat (Barbell)', sets: 5 },
+                    { name: 'Overhead Press (Dumbbell)', sets: 5 },
+                    { name: 'Deadlift (Barbell)', sets: 1 }
+                ]
+            },
+            {
+                id: 'et-2',
+                name: 'Legs Machine Focus',
+                exercises: [
+                    { name: 'Squat (Barbell)', sets: 3 },
+                    { name: 'Leg Extension (Machine)', sets: 3 },
+                    { name: 'Flat Dumbbell Fly', sets: 3 }
+                ]
+            },
+            {
+                id: 'et-3',
+                name: 'Chest & Arms Express',
+                exercises: [
+                    { name: 'Bench Press (Barbell)', sets: 4 },
+                    { name: 'Bicep Curl (Dumbbell)', sets: 3 },
+                    { name: 'Triceps Extension (Dumbbell)', sets: 3 }
+                ]
+            },
+            {
+                id: 'et-4',
+                name: 'Back Hypertrophy',
+                exercises: [
+                    { name: 'Lat Pulldown (Cable)', sets: 4 },
+                    { name: 'Reverse Fly (Dumbbell)', sets: 3 },
+                    { name: 'Deadlift (Barbell)', sets: 3 }
+                ]
+            },
+            {
+                id: 'et-5',
+                name: 'Full Body Conditioning',
+                exercises: [
+                    { name: 'Goblet Squat (Kettlebell)', sets: 3 },
+                    { name: 'Bench Dip', sets: 3 },
+                    { name: 'Step-up', sets: 3 }
+                ]
+            }
+        ];
+
+        // Default Demo Workout History
+        const INITIAL_WORKOUTS = [
+            {
+                id: 'w-1',
+                title: 'Evening Workout',
+                dateStr: 'Friday, August 14, 2026 at 6:11 PM',
+                isoDate: '2026-08-14T18:11:00',
+                duration: '40m',
+                durationMin: 40,
+                volume: '1170 kg',
+                volumeVal: 1170,
+                prs: 0,
+                notes: 'Felt solid on triceps. Focused on time under tension.',
+                exercises: [
+                    {
+                        name: 'Triceps Extension (Dumbbell)',
+                        setsCount: 5,
+                        bestSet: '10 kg × 8',
+                        sets: [
+                            { setNum: 1, weight: '8 kg', reps: 10, isPr: false },
+                            { setNum: 2, weight: '10 kg', reps: 8, isPr: false },
+                            { setNum: 3, weight: '10 kg', reps: 8, isPr: false },
+                            { setNum: 4, weight: '10 kg', reps: 7, isPr: false },
+                            { setNum: 5, weight: '8 kg', reps: 10, isPr: false }
+                        ]
+                    },
+                    {
+                        name: 'Bicep Curl (Dumbbell)',
+                        setsCount: 4,
+                        bestSet: '7.5 kg × 10',
+                        sets: [
+                            { setNum: 1, weight: '7.5 kg', reps: 10, isPr: false },
+                            { setNum: 2, weight: '7.5 kg', reps: 10, isPr: false },
+                            { setNum: 3, weight: '7.5 kg', reps: 9, isPr: false },
+                            { setNum: 4, weight: '7.5 kg', reps: 8, isPr: false }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'w-2',
+                title: 'Evening Workout',
+                dateStr: 'Thursday, August 13, 2026 at 6:40 PM',
+                isoDate: '2026-08-13T18:40:00',
+                duration: '14m',
+                durationMin: 14,
+                volume: '920 kg',
+                volumeVal: 920,
+                prs: 2,
+                notes: 'Quick overhead session. Set 2 PRs on shoulder press!',
+                exercises: [
+                    {
+                        name: 'Overhead Press (Dumbbell)',
+                        setsCount: 5,
+                        bestSet: '15 kg × 10',
+                        sets: [
+                            { setNum: 1, weight: '12.5 kg', reps: 12, isPr: false },
+                            { setNum: 2, weight: '15 kg', reps: 10, isPr: true },
+                            { setNum: 3, weight: '15 kg', reps: 10, isPr: true },
+                            { setNum: 4, weight: '12.5 kg', reps: 10, isPr: false },
+                            { setNum: 5, weight: '12.5 kg', reps: 8, isPr: false }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Widget Registry Definition
+        const WIDGET_REGISTRY = {
+            'workouts-per-week': {
+                id: 'workouts-per-week',
+                name: 'Workouts per week',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Workouts per week</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('workouts-per-week')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+          </div>
+          ${goal ? `<div class="goal-pill">${escapeHtml(goal)}</div>` : ''}
+          <div class="chart-box">
+            <div class="chart-bars-row">
+              <div class="bar-group"><div class="bar-track"><div class="bar-segment" data-h="50%"></div></div><span class="bar-date">Mon</span></div>
+              <div class="bar-group"><div class="bar-track"><div class="bar-segment" data-h="100%"></div></div><span class="bar-date">Wed</span></div>
+              <div class="bar-group"><div class="bar-track"><div class="bar-segment" data-h="75%"></div></div><span class="bar-date">Fri</span></div>
+            </div>
+          </div>`
+            }
+        };
+
+        const INITIAL_STATE = {
+            user: { username: 'SKV', workouts: 246, avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250' },
+            widgets: ['workouts-per-week'],
+            goals: {},
+            workouts: INITIAL_WORKOUTS,
+            userTemplates: INITIAL_USER_TEMPLATES,
+            exampleTemplates: INITIAL_EXAMPLE_TEMPLATES,
+            folders: ['All', 'Legs', 'Upper Body'],
+            timerSettings: { autoStart: true, increment: 30, sound: 'Boxing Bell', vibrate: true },
+            filter: 'all',
+            sort: 'newest'
+        };
+
+        class PulseFitApp {
+            constructor() {
+                this.initDOM();
+                this.state = this.loadState();
+                this.activeTab = 'workout';
+                this.pickerTarget = null; // 'template' or 'active'
+                this.editingTemplateId = null;
+                this.tempExercises = [];
+                this.selectedTemplateForCardMenu = null;
+                this.pendingDeleteAction = null;
+
+                // Active Workout State
+                this.activeSession = null;
+                this.clockInterval = null;
+                this.restTimerInterval = null;
+                this.restTimerSeconds = 0;
+                this.restTimerPaused = false;
+
+                this.bindEvents();
+                this.renderAll();
+                this.switchTab('workout');
+            }
+
+            loadState() {
+                try {
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (!raw) return JSON.parse(JSON.stringify(INITIAL_STATE));
+                    const parsed = JSON.parse(raw);
+                    return { ...INITIAL_STATE, ...parsed };
+                } catch (e) {
+                    return JSON.parse(JSON.stringify(INITIAL_STATE));
+                }
+            }
+
+            saveState() {
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.state));
+                } catch (e) {
+                    console.error('Storage error:', e);
+                }
+            }
+
+            initDOM() {
+                this.backdrop = document.getElementById('sheet-backdrop');
+                this.toastEl = document.getElementById('app-toast');
+                this.historyFeed = document.getElementById('workout-history-feed');
+                this.searchInput = document.getElementById('history-search-input');
+                this.searchClearBtn = document.getElementById('history-search-clear');
+                this.sortSelect = document.getElementById('history-sort-select');
+            }
+
+            bindEvents() {
+                this.backdrop.addEventListener('click', () => this.closeSheets());
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                });
+            }
+
+            showToast(msg) {
+                this.toastEl.textContent = msg;
+                this.toastEl.classList.add('visible');
+                setTimeout(() => this.toastEl.classList.remove('visible'), 2500);
+            }
+
+            switchTab(tabKey) {
+                if (tabKey === 'exercises' || tabKey === 'measure') {
+                    this.showToast('Coming next');
+                    return;
+                }
+                this.activeTab = tabKey;
+                document.querySelectorAll('.nav-tab').forEach(t => {
+                    t.classList.toggle('active', t.dataset.tab === tabKey);
+                    const dot = t.querySelector('.active-dot');
+                    if (dot) dot.remove();
+                    if (t.dataset.tab === tabKey) {
+                        const d = document.createElement('div');
+                        d.className = 'active-dot';
+                        t.appendChild(d);
+                    }
+                });
+
+                document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+                const targetView = document.getElementById(`tab-${tabKey}`);
+                if (targetView) targetView.classList.add('active');
+
+                const titleEl = document.getElementById('page-title');
+                const actionsEl = document.getElementById('header-actions');
+
+                if (tabKey === 'workout') {
+                    titleEl.textContent = 'Workout';
+                    actionsEl.innerHTML = `
+                        <button class="icon-btn" onclick="app.openWorkoutSearchSheet()" aria-label="Search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </button>`;
+                } else if (tabKey === 'profile') {
+                    titleEl.textContent = 'Profile';
+                    actionsEl.innerHTML = `<button class="icon-btn gold-badge">PRO</button>`;
+                } else if (tabKey === 'history') {
+                    titleEl.textContent = 'History';
+                    actionsEl.innerHTML = '';
+                }
+            }
+
+            renderAll() {
+                this.renderProfile();
+                this.renderHistory();
+                this.renderWorkoutTab();
+            }
+
+            renderProfile() {
+                this.state.user.workouts = this.state.workouts.length;
+                document.getElementById('user-name-txt').textContent = this.state.user.username;
+                document.getElementById('user-workouts-txt').textContent = this.state.user.workouts;
+            }
+
+            renderHistory() {
+                if (!this.historyFeed) return;
+                this.historyFeed.innerHTML = '';
+                if (this.state.workouts.length === 0) {
+                    this.historyFeed.innerHTML = '<div class="empty-history-state"><h3>No workouts yet</h3></div>';
+                    return;
+                }
+                this.state.workouts.forEach(w => {
+                    const card = document.createElement('div');
+                    card.className = 'workout-card';
+                    card.onclick = () => this.openWorkoutDetail(w.id);
+                    card.innerHTML = `
+                        <div class="workout-card-top">
+                            <div>
+                                <div class="workout-title">${escapeHtml(w.title)}</div>
+                                <div class="workout-date">${escapeHtml(w.dateStr)}</div>
+                            </div>
+                            ${w.prs > 0 ? `<div class="pr-tag-badge">${w.prs} PRs</div>` : ''}
+                        </div>
+                        <div class="workout-stats-footer">
+                            <span>⏱️ ${w.duration}</span>
+                            <span>🏋️ ${w.volume}</span>
+                        </div>`;
+                    this.historyFeed.appendChild(card);
+                });
+            }
+
+            /* WORKOUT TAB RENDERING & ACTIONS */
+            renderWorkoutTab() {
+                const foldersContainer = document.getElementById('template-folder-bar');
+                foldersContainer.innerHTML = '';
+                this.state.folders.forEach(f => {
+                    const pill = document.createElement('button');
+                    pill.className = `folder-pill ${f === 'All' ? 'active' : ''}`;
+                    pill.textContent = f;
+                    pill.onclick = () => {
+                        document.querySelectorAll('.folder-pill').forEach(p => p.classList.remove('active'));
+                        pill.classList.add('active');
+                        this.filterTemplatesByFolder(f);
+                    };
+                    foldersContainer.appendChild(pill);
+                });
+
+                this.renderUserTemplates(this.state.userTemplates);
+
+                document.getElementById('example-count-num').textContent = this.state.exampleTemplates.length;
+                const exGrid = document.getElementById('example-templates-grid');
+                exGrid.innerHTML = '';
+                this.state.exampleTemplates.forEach(tpl => {
+                    const descStr = tpl.exercises.map(e => `${e.sets} × ${e.name}`).slice(0, 2).join('<br>') + (tpl.exercises.length > 2 ? '<br>...' : '');
+                    const card = document.createElement('div');
+                    card.className = 'template-card example-card';
+                    card.innerHTML = `
+                        <div class="template-header">
+                            <div class="template-name">${escapeHtml(tpl.name)}</div>
+                            <button class="menu-dots-btn" onclick="app.openExampleCardMenu('${tpl.id}')">⋮</button>
+                        </div>
+                        <div class="template-desc">${descStr}</div>
+                        <button class="primary-action-btn" style="padding:8px; font-size:12px; margin-top:8px;" onclick="app.startWorkoutFromTemplate('${tpl.id}', true)">Start Workout</button>
+                    `;
+                    exGrid.appendChild(card);
+                });
+            }
+
+            renderUserTemplates(list) {
+                const uGrid = document.getElementById('user-templates-grid');
+                uGrid.innerHTML = '';
+                if (list.length === 0) {
+                    uGrid.innerHTML = '<div style="font-size:13px; color:var(--text-tertiary); grid-column:1/-1;">No templates in this folder.</div>';
+                    return;
+                }
+                list.forEach(tpl => {
+                    const descStr = tpl.exercises.map(e => `${e.sets} × ${e.name}`).slice(0, 2).join('<br>') + (tpl.exercises.length > 2 ? '<br>...' : '');
+                    const card = document.createElement('div');
+                    card.className = 'template-card';
+                    card.innerHTML = `
+                        <div class="template-header">
+                            <div class="template-name">${escapeHtml(tpl.name)}</div>
+                            <button class="menu-dots-btn" onclick="app.openUserCardMenu('${tpl.id}')">⋮</button>
+                        </div>
+                        <div class="template-desc">${descStr}</div>
+                        <div class="template-meta">Last used: ${tpl.lastUsed || 'Never'}</div>
+                        <button class="primary-action-btn" style="padding:8px; font-size:12px; margin-top:8px;" onclick="app.startWorkoutFromTemplate('${tpl.id}', false)">Start Workout</button>
+                    `;
+                    uGrid.appendChild(card);
+                });
+            }
+
+            filterTemplatesByFolder(folder) {
+                if (folder === 'All') {
+                    this.renderUserTemplates(this.state.userTemplates);
+                } else {
+                    const filtered = this.state.userTemplates.filter(t => t.folder === folder);
+                    this.renderUserTemplates(filtered);
+                }
+            }
+
+            /* SHEET NAVIGATION CONTROLLER */
+            openSheet(sheetId) {
+                this.closeSheets();
+                this.backdrop.classList.add('active');
+                const sheet = document.getElementById(`sheet-${sheetId}`);
+                if (sheet) sheet.classList.add('active');
+            }
+
+            closeSheets() {
+                this.backdrop.classList.remove('active');
+                document.querySelectorAll('.bottom-sheet-drawer').forEach(s => s.classList.remove('active'));
+            }
+
+            /* TEMPLATE CREATION & EDITING */
+            openCreateTemplateSheet(editId = null) {
+                this.editingTemplateId = editId;
+                const titleEl = document.getElementById('template-modal-title');
+                if (editId) {
+                    titleEl.textContent = 'Edit Template';
+                    const tpl = this.state.userTemplates.find(t => t.id === editId);
+                    document.getElementById('tpl-name-input').value = tpl.name;
+                    document.getElementById('tpl-desc-input').value = tpl.folder || '';
+                    this.tempExercises = [...tpl.exercises];
+                } else {
+                    titleEl.textContent = 'Create Template';
+                    document.getElementById('tpl-name-input').value = '';
+                    document.getElementById('tpl-desc-input').value = '';
+                    this.tempExercises = [];
+                }
+                this.renderTempExercisesList();
+                this.openSheet('create-template');
+            }
+
+            renderTempExercisesList() {
+                const list = document.getElementById('tpl-exercises-edit-list');
+                list.innerHTML = '';
+                this.tempExercises.forEach((ex, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'option-card';
+                    row.innerHTML = `
+                        <div>
+                            <div class="option-title">${escapeHtml(ex.name)}</div>
+                            <div class="option-sub">${ex.sets} sets</div>
+                        </div>
+                        <button class="icon-btn-sm" onclick="app.removeTempExercise(${idx})">✕</button>
+                    `;
+                    list.appendChild(row);
+                });
+            }
+
+            removeTempExercise(idx) {
+                this.tempExercises.splice(idx, 1);
+                this.renderTempExercisesList();
+            }
+
+            openExercisePickerForTemplate() {
+                this.pickerTarget = 'template';
+                this.renderExercisePickerList(EXERCISE_LIBRARY);
+                this.openSheet('exercise-picker');
+            }
+
+            openExercisePickerForActive() {
+                this.pickerTarget = 'active';
+                this.renderExercisePickerList(EXERCISE_LIBRARY);
+                this.openSheet('exercise-picker');
+            }
+
+            renderExercisePickerList(list) {
+                const container = document.getElementById('exercise-picker-list');
+                container.innerHTML = '';
+                list.forEach(exName => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.innerHTML = `<div class="option-title">${escapeHtml(exName)}</div>`;
+                    card.onclick = () => this.selectExerciseFromPicker(exName);
+                    container.appendChild(card);
+                });
+            }
+
+            filterExercisePicker(query) {
+                const filtered = EXERCISE_LIBRARY.filter(e => e.toLowerCase().includes(query.toLowerCase()));
+                this.renderExercisePickerList(filtered);
+            }
+
+            selectExerciseFromPicker(exName) {
+                if (this.pickerTarget === 'template') {
+                    this.tempExercises.push({ name: exName, sets: 3 });
+                    this.renderTempExercisesList();
+                    this.openSheet('create-template');
+                } else if (this.pickerTarget === 'active') {
+                    if (this.activeSession) {
+                        this.activeSession.exercises.push({
+                            name: exName,
+                            sets: [
+                                { weight: 0, reps: 0, completed: false, prev: '—' }
+                            ]
+                        });
+                        this.renderActiveSessionUI();
+                    }
+                    this.closeSheets();
+                }
+            }
+
+            saveTemplate() {
+                const name = document.getElementById('tpl-name-input').value.trim();
+                const folder = document.getElementById('tpl-desc-input').value.trim() || 'All';
+
+                if (!name) {
+                    this.showToast('Please enter a template name');
+                    return;
+                }
+
+                if (this.editingTemplateId) {
+                    const tpl = this.state.userTemplates.find(t => t.id === this.editingTemplateId);
+                    if (tpl) {
+                        tpl.name = name;
+                        tpl.folder = folder;
+                        tpl.exercises = [...this.tempExercises];
+                    }
+                } else {
+                    const newTpl = {
+                        id: 'ut-' + Date.now(),
+                        name: name,
+                        folder: folder,
+                        lastUsed: 'Never',
+                        exercises: [...this.tempExercises]
+                    };
+                    this.state.userTemplates.push(newTpl);
+                }
+
+                if (!this.state.folders.includes(folder)) {
+                    this.state.folders.push(folder);
+                }
+
+                this.saveState();
+                this.renderWorkoutTab();
+                this.closeSheets();
+                this.showToast('Template saved successfully!');
+            }
+
+            /* TEMPLATE CARD MENUS */
+            openUserCardMenu(tplId) {
+                this.selectedTemplateForCardMenu = tplId;
+                const tpl = this.state.userTemplates.find(t => t.id === tplId);
+                document.getElementById('tpl-card-menu-title').textContent = tpl.name;
+                const body = document.getElementById('tpl-card-actions-body');
+                body.innerHTML = `
+                    <button class="action-row-btn" onclick="app.startWorkoutFromTemplate('${tplId}', false)">Start Workout</button>
+                    <button class="action-row-btn" onclick="app.openCreateTemplateSheet('${tplId}')">Edit Template</button>
+                    <button class="action-row-btn" onclick="app.duplicateUserTemplate('${tplId}')">Duplicate</button>
+                    <button class="action-row-btn" onclick="app.renameUserTemplate('${tplId}')">Rename</button>
+                    <button class="action-row-btn danger" onclick="app.confirmDeleteUserTemplate('${tplId}')">Delete</button>
+                `;
+                this.openSheet('template-card-menu');
+            }
+
+            openExampleCardMenu(tplId) {
+                this.selectedTemplateForCardMenu = tplId;
+                const tpl = this.state.exampleTemplates.find(t => t.id === tplId);
+                document.getElementById('tpl-card-menu-title').textContent = tpl.name;
+                const body = document.getElementById('tpl-card-actions-body');
+                body.innerHTML = `
+                    <button class="action-row-btn" onclick="app.startWorkoutFromTemplate('${tplId}', true)">Start Workout</button>
+                    <button class="action-row-btn" onclick="app.duplicateExampleTemplate('${tplId}')">Duplicate to My Templates</button>
+                `;
+                this.openSheet('template-card-menu');
+            }
+
+            duplicateUserTemplate(tplId) {
+                const tpl = this.state.userTemplates.find(t => t.id === tplId);
+                if (tpl) {
+                    const dup = JSON.parse(JSON.stringify(tpl));
+                    dup.id = 'ut-' + Date.now();
+                    dup.name += ' (Copy)';
+                    this.state.userTemplates.push(dup);
+                    this.saveState();
+                    this.renderWorkoutTab();
+                    this.closeSheets();
+                    this.showToast('Template duplicated');
+                }
+            }
+
+            duplicateExampleTemplate(tplId) {
+                const tpl = this.state.exampleTemplates.find(t => t.id === tplId);
+                if (tpl) {
+                    const dup = {
+                        id: 'ut-' + Date.now(),
+                        name: tpl.name,
+                        folder: 'All',
+                        lastUsed: 'Never',
+                        exercises: JSON.parse(JSON.stringify(tpl.exercises))
+                    };
+                    this.state.userTemplates.push(dup);
+                    this.saveState();
+                    this.renderWorkoutTab();
+                    this.closeSheets();
+                    this.showToast('Copied to My Templates');
+                }
+            }
+
+            renameUserTemplate(tplId) {
+                const tpl = this.state.userTemplates.find(t => t.id === tplId);
+                if (tpl) {
+                    const newName = prompt('Enter new template name:', tpl.name);
+                    if (newName) {
+                        tpl.name = newName;
+                        this.saveState();
+                        this.renderWorkoutTab();
+                        this.closeSheets();
+                    }
+                }
+            }
+
+            confirmDeleteUserTemplate(tplId) {
+                this.pendingDeleteAction = () => {
+                    this.state.userTemplates = this.state.userTemplates.filter(t => t.id !== tplId);
+                    this.saveState();
+                    this.renderWorkoutTab();
+                    this.closeSheets();
+                    this.showToast('Template deleted');
+                };
+                document.getElementById('delete-confirm-msg').textContent = 'Are you sure you want to delete this template?';
+                this.openSheet('delete-confirm');
+            }
+
+            executePendingDelete() {
+                if (this.pendingDeleteAction) {
+                    this.pendingDeleteAction();
+                    this.pendingDeleteAction = null;
+                }
+            }
+
+            /* FOLDERS & TEMPLATE MENU */
+            openFolderManagerSheet() {
+                const container = document.getElementById('folders-list-container');
+                container.innerHTML = '';
+                this.state.folders.forEach((f, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.innerHTML = `
+                        <span class="option-title">${escapeHtml(f)}</span>
+                        ${f !== 'All' ? `<button class="icon-btn-sm" onclick="app.deleteFolder(${idx})">✕</button>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+                this.openSheet('folder-manager');
+            }
+
+            addFolder() {
+                const input = document.getElementById('new-folder-input');
+                const val = input.value.trim();
+                if (val && !this.state.folders.includes(val)) {
+                    this.state.folders.push(val);
+                    input.value = '';
+                    this.saveState();
+                    this.openFolderManagerSheet();
+                    this.renderWorkoutTab();
+                }
+            }
+
+            deleteFolder(idx) {
+                this.state.folders.splice(idx, 1);
+                this.saveState();
+                this.openFolderManagerSheet();
+                this.renderWorkoutTab();
+            }
+
+            openTemplateMenuSheet() {
+                this.openSheet('template-menu');
+            }
+
+            sortTemplatesAlphabetical() {
+                this.state.userTemplates.sort((a, b) => a.name.localeCompare(b.name));
+                this.saveState();
+                this.renderWorkoutTab();
+                this.closeSheets();
+                this.showToast('Sorted alphabetically');
+            }
+
+            resetExampleTemplates() {
+                this.state.exampleTemplates = JSON.parse(JSON.stringify(INITIAL_EXAMPLE_TEMPLATES));
+                this.saveState();
+                this.renderWorkoutTab();
+                this.closeSheets();
+                this.showToast('Example templates reset');
+            }
+
+            /* SEARCH WORKOUT SHEET */
+            openWorkoutSearchSheet() {
+                document.getElementById('workout-search-input').value = '';
+                this.renderWorkoutSearchResults('');
+                this.openSheet('workout-search');
+            }
+
+            renderWorkoutSearchResults(query) {
+                const container = document.getElementById('workout-search-results-list');
+                container.innerHTML = '';
+                const q = query.toLowerCase().trim();
+
+                // Match user templates
+                this.state.userTemplates.forEach(t => {
+                    if (!q || t.name.toLowerCase().includes(q) || t.exercises.some(e => e.name.toLowerCase().includes(q))) {
+                        const div = document.createElement('div');
+                        div.className = 'search-res-item';
+                        div.innerHTML = `<div class="search-res-title">📋 ${escapeHtml(t.name)}</div><div class="search-res-sub">Template</div>`;
+                        div.onclick = () => { this.closeSheets(); this.startWorkoutFromTemplate(t.id, false); };
+                        container.appendChild(div);
+                    }
+                });
+
+                // Match exercises
+                EXERCISE_LIBRARY.forEach(ex => {
+                    if (!q || ex.toLowerCase().includes(q)) {
+                        const div = document.createElement('div');
+                        div.className = 'search-res-item';
+                        div.innerHTML = `<div class="search-res-title">🏋️ ${escapeHtml(ex)}</div><div class="search-res-sub">Exercise</div>`;
+                        div.onclick = () => {
+                            this.closeSheets();
+                            this.startWorkout();
+                            this.activeSession.exercises.push({ name: ex, sets: [{ weight: 0, reps: 0, completed: false, prev: '—' }] });
+                            this.renderActiveSessionUI();
+                        };
+                        container.appendChild(div);
+                    }
+                });
+            }
+
+            /* ACTIVE WORKOUT LOGIC */
+            startWorkout() {
+                this.activeSession = {
+                    title: 'Empty Workout',
+                    startTime: Date.now(),
+                    elapsedSeconds: 0,
+                    exercises: [],
+                    notes: ''
+                };
+                this.launchActiveWorkoutScreen();
+            }
+
+            startWorkoutFromTemplate(tplId, isExample) {
+                this.closeSheets();
+                const list = isExample ? this.state.exampleTemplates : this.state.userTemplates;
+                const tpl = list.find(t => t.id === tplId);
+                if (!tpl) return;
+
+                if (!isExample) {
+                    tpl.lastUsed = 'Today';
+                    this.saveState();
+                    this.renderWorkoutTab();
+                }
+
+                this.activeSession = {
+                    title: tpl.name,
+                    startTime: Date.now(),
+                    elapsedSeconds: 0,
+                    exercises: tpl.exercises.map(ex => ({
+                        name: ex.name,
+                        sets: Array.from({ length: ex.sets || 3 }, (_, i) => ({
+                            weight: 12.5,
+                            reps: 8,
+                            completed: false,
+                            prev: '12.5 kg × 8'
+                        }))
+                    })),
+                    notes: ''
+                };
+                this.launchActiveWorkoutScreen();
+            }
+
+            launchActiveWorkoutScreen() {
+                document.getElementById('active-workout-title-txt').textContent = this.activeSession.title;
+                document.getElementById('active-workout-screen').classList.add('open');
+
+                if (this.clockInterval) clearInterval(this.clockInterval);
+                this.clockInterval = setInterval(() => {
+                    this.activeSession.elapsedSeconds++;
+                    const m = String(Math.floor(this.activeSession.elapsedSeconds / 60)).padStart(2, '0');
+                    const s = String(this.activeSession.elapsedSeconds % 60).padStart(2, '0');
+                    document.getElementById('active-timer-clock').textContent = `${m}:${s}`;
+                }, 1000);
+
+                this.renderActiveSessionUI();
+            }
+
+            minimizeOrCancelActiveWorkout() {
+                if (confirm('Discard active workout session?')) {
+                    this.stopActiveSessionClocks();
+                    document.getElementById('active-workout-screen').classList.remove('open');
+                    this.activeSession = null;
+                }
+            }
+
+            stopActiveSessionClocks() {
+                if (this.clockInterval) clearInterval(this.clockInterval);
+                if (this.restTimerInterval) clearInterval(this.restTimerInterval);
+                document.getElementById('rest-timer-bar').classList.remove('visible');
+            }
+
+            renderActiveSessionUI() {
+                if (!this.activeSession) return;
+
+                let totalVol = 0;
+                let totalSetsCount = 0;
+                this.activeSession.exercises.forEach(ex => {
+                    ex.sets.forEach(s => {
+                        if (s.completed) {
+                            totalVol += (Number(s.weight) || 0) * (Number(s.reps) || 0);
+                            totalSetsCount++;
+                        }
+                    });
+                });
+
+                document.getElementById('active-stat-volume').textContent = `${totalVol} kg`;
+                document.getElementById('active-stat-sets').textContent = totalSetsCount;
+                document.getElementById('active-stat-ex').textContent = this.activeSession.exercises.length;
+
+                const container = document.getElementById('active-exercises-list');
+                container.innerHTML = '';
+
+                this.activeSession.exercises.forEach((ex, exIdx) => {
+                    const card = document.createElement('div');
+                    card.className = 'active-ex-card';
+
+                    let setsRowsHtml = '';
+                    ex.sets.forEach((set, setIdx) => {
+                        setsRowsHtml += `
+                            <div class="set-row-item ${set.completed ? 'completed' : ''}">
+                                <div class="set-num-badge">${setIdx + 1}</div>
+                                <div class="prev-val">${set.prev || '—'}</div>
+                                <div><input type="number" class="set-input-num" value="${set.weight}" onchange="app.updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)"></div>
+                                <div><input type="number" class="set-input-num" value="${set.reps}" onchange="app.updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)"></div>
+                                <button class="check-btn-set" onclick="app.toggleSetComplete(${exIdx}, ${setIdx})">
+                                    ${set.completed ? '✓' : '○'}
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="active-ex-header">
+                            <div class="active-ex-name">${escapeHtml(ex.name)}</div>
+                            <button class="icon-btn-sm" onclick="app.removeExerciseFromActive(${exIdx})">✕</button>
+                        </div>
+                        <div class="set-table-header">
+                            <span>Set</span><span>Previous</span><span>Kg</span><span>Reps</span><span>Done</span>
+                        </div>
+                        ${setsRowsHtml}
+                        <button class="btn-add-set" onclick="app.addSetToActiveExercise(${exIdx})">+ Add Set</button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            updateSetVal(exIdx, setIdx, field, val) {
+                if (this.activeSession) {
+                    this.activeSession.exercises[exIdx].sets[setIdx][field] = Number(val);
+                    this.renderActiveSessionUI();
+                }
+            }
+
+            toggleSetComplete(exIdx, setIdx) {
+                if (!this.activeSession) return;
+                const set = this.activeSession.exercises[exIdx].sets[setIdx];
+                set.completed = !set.completed;
+                this.renderActiveSessionUI();
+
+                if (set.completed && this.state.timerSettings.autoStart) {
+                    this.startRestTimer();
+                }
+            }
+
+            addSetToActiveExercise(exIdx) {
+                if (!this.activeSession) return;
+                const ex = this.activeSession.exercises[exIdx];
+                const lastSet = ex.sets[ex.sets.length - 1] || { weight: 10, reps: 8 };
+                ex.sets.push({
+                    weight: lastSet.weight,
+                    reps: lastSet.reps,
+                    completed: false,
+                    prev: `${lastSet.weight} kg × ${lastSet.reps}`
+                });
+                this.renderActiveSessionUI();
+            }
+
+            removeExerciseFromActive(exIdx) {
+                if (!this.activeSession) return;
+                this.activeSession.exercises.splice(exIdx, 1);
+                this.renderActiveSessionUI();
+            }
+
+            promptAddActiveNote() {
+                const note = prompt('Add workout note:', this.activeSession.notes);
+                if (note !== null) {
+                    this.activeSession.notes = note;
+                    this.showToast('Note added');
+                }
+            }
+
+            /* REST TIMER */
+            startRestTimer() {
+                this.restTimerSeconds = this.state.timerSettings.increment || 30;
+                this.restTimerPaused = false;
+                document.getElementById('btn-pause-rest').textContent = 'Pause';
+                document.getElementById('rest-timer-bar').classList.add('visible');
+
+                if (this.restTimerInterval) clearInterval(this.restTimerInterval);
+                this.updateRestTimerDisplay();
+
+                this.restTimerInterval = setInterval(() => {
+                    if (!this.restTimerPaused) {
+                        this.restTimerSeconds--;
+                        this.updateRestTimerDisplay();
+                        if (this.restTimerSeconds <= 0) {
+                            clearInterval(this.restTimerInterval);
+                            document.getElementById('rest-timer-bar').classList.remove('visible');
+                            if (this.state.timerSettings.vibrate && navigator.vibrate) {
+                                navigator.vibrate([200, 100, 200]);
+                            }
+                            this.showToast('Rest timer finished!');
+                        }
+                    }
+                }, 1000);
+            }
+
+            updateRestTimerDisplay() {
+                const m = String(Math.floor(this.restTimerSeconds / 60)).padStart(2, '0');
+                const s = String(this.restTimerSeconds % 60).padStart(2, '0');
+                document.getElementById('rest-timer-val').textContent = `${m}:${s}`;
+            }
+
+            toggleRestTimerPause() {
+                this.restTimerPaused = !this.restTimerPaused;
+                document.getElementById('btn-pause-rest').textContent = this.restTimerPaused ? 'Resume' : 'Pause';
+            }
+
+            addRestTimerTime(secs) {
+                this.restTimerSeconds += secs;
+                this.updateRestTimerDisplay();
+            }
+
+            skipRestTimer() {
+                if (this.restTimerInterval) clearInterval(this.restTimerInterval);
+                document.getElementById('rest-timer-bar').classList.remove('visible');
+            }
+
+            /* FINISH WORKOUT */
+            finishWorkout() {
+                if (!this.activeSession) return;
+
+                this.stopActiveSessionClocks();
+                document.getElementById('active-workout-screen').classList.remove('open');
+
+                let totalVol = 0;
+                let setsCount = 0;
+                const completedExList = [];
+
+                this.activeSession.exercises.forEach(ex => {
+                    const compSets = ex.sets.filter(s => s.completed);
+                    if (compSets.length > 0) {
+                        setsCount += compSets.length;
+                        let bestW = 0;
+                        let bestR = 0;
+                        compSets.forEach(s => {
+                            totalVol += s.weight * s.reps;
+                            if (s.weight > bestW) {
+                                bestW = s.weight;
+                                bestR = s.reps;
+                            }
+                        });
+                        completedExList.push({
+                            name: ex.name,
+                            setsCount: compSets.length,
+                            bestSet: `${bestW} kg × ${bestR}`,
+                            sets: compSets.map((s, i) => ({ setNum: i + 1, weight: `${s.weight} kg`, reps: s.reps, isPr: false }))
+                        });
+                    }
+                });
+
+                const durationMin = Math.max(1, Math.floor(this.activeSession.elapsedSeconds / 60));
+                const newWorkout = {
+                    id: 'w-' + Date.now(),
+                    title: this.activeSession.title,
+                    dateStr: new Date().toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }),
+                    isoDate: new Date().toISOString(),
+                    duration: `${durationMin}m`,
+                    durationMin: durationMin,
+                    volume: `${totalVol} kg`,
+                    volumeVal: totalVol,
+                    prs: 1,
+                    notes: this.activeSession.notes,
+                    exercises: completedExList
+                };
+
+                this.state.workouts.unshift(newWorkout);
+                this.saveState();
+
+                // Celebration Stats
+                document.getElementById('celeb-time').textContent = `${durationMin}m`;
+                document.getElementById('celeb-vol').textContent = `${totalVol} kg`;
+                document.getElementById('celeb-sets').textContent = setsCount;
+                document.getElementById('celeb-prs').textContent = `1 PR`;
+
+                this.lastCompletedId = newWorkout.id;
+                this.renderAll();
+                this.openSheet('workout-complete');
+                this.activeSession = null;
+            }
+
+            viewCompletedFromCelebration() {
+                this.closeSheets();
+                if (this.lastCompletedId) {
+                    this.openWorkoutDetail(this.lastCompletedId);
+                }
+            }
+
+            openWorkoutDetail(id) {
+                const w = this.state.workouts.find(item => item.id === id);
+                if (!w) return;
+
+                const content = document.getElementById('workout-detail-content');
+                let exHtml = '';
+                w.exercises.forEach(e => {
+                    exHtml += `<div class="exercise-detail-card">
+                        <div class="exercise-detail-name"><span>${escapeHtml(e.name)}</span></div>`;
+                    e.sets.forEach(s => {
+                        exHtml += `<div class="exercise-set-row">
+                            <span class="set-num">Set ${s.setNum}</span>
+                            <span class="set-weight-reps">${s.weight} × ${s.reps}</span>
+                        </div>`;
+                    });
+                    exHtml += `</div>`;
+                });
+
+                content.innerHTML = `
+                    <div class="workout-detail-header">
+                        <div class="workout-detail-title">${escapeHtml(w.title)}</div>
+                        <div class="workout-detail-date">${escapeHtml(w.dateStr)}</div>
+                    </div>
+                    <div class="workout-detail-stats-grid">
+                        <div class="detail-stat-box"><div class="lbl">Time</div><div class="val">${w.duration}</div></div>
+                        <div class="detail-stat-box"><div class="lbl">Volume</div><div class="val">${w.volume}</div></div>
+                        <div class="detail-stat-box"><div class="lbl">Records</div><div class="val">${w.prs} PRs</div></div>
+                    </div>
+                    ${exHtml}
+                    ${w.notes ? `<div class="workout-notes-box">"${escapeHtml(w.notes)}"</div>` : ''}
+                `;
+                this.openSheet('workout-detail');
+            }
+        }
+
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new PulseFitApp();
+        });
+    </script>
+</body>
+
+</html>

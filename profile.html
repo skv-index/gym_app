@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PulseFit PRO - Premium Mobile Fitness Tracker</title>
+    <style>
+        /* ==========================================
+       DESIGN TOKENS & SYSTEM VARIABLES
+       ========================================== */
+        :root {
+            /* Color Palette */
+            --bg-base: #06080F;
+            --bg-surface-1: rgba(18, 24, 38, 0.65);
+            --bg-surface-2: rgba(30, 40, 62, 0.5);
+            --bg-glass: rgba(255, 255, 255, 0.035);
+            --bg-glass-hover: rgba(255, 255, 255, 0.07);
+
+            /* Glass Borders & Highlights */
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass-bright: rgba(255, 255, 255, 0.18);
+            --border-accent: rgba(139, 92, 246, 0.4);
+            --inset-glow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+
+            /* Vibrant Accents */
+            --accent-purple: #8B5CF6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.4);
+            --accent-cyan: #06B6D4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.35);
+            --accent-gold: #F59E0B;
+            --accent-gold-glow: rgba(245, 158, 11, 0.35);
+            --accent-pink: #EC4899;
+
+            /* Neutral Text Hierarchy */
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+            --text-muted: #475569;
+
+            /* UI Constants */
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+
+            --shadow-ambient: 0 20px 50px rgba(0, 0, 0, 0.6);
+            --shadow-glow-purple: 0 8px 32px rgba(139, 92, 246, 0.25);
+
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-fast: 0.2s;
+            --duration-normal: 0.35s;
+        }
+
+        /* ==========================================
+       RESET & BASE STYLES
+       ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #020305;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ==========================================
+       APP SHELL CONTAINER (MOBILE VIEWPORT)
+       ========================================== */
+        .app-shell {
+            width: 100%;
+            max-width: 390px;
+            height: 100vh;
+            max-height: 844px;
+            background: var(--bg-base);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-ambient), 0 0 0 12px #111522;
+            border-radius: 0px;
+        }
+
+        @media (min-height: 700px) and (min-width: 400px) {
+            .app-shell {
+                height: 92vh;
+                border-radius: 44px;
+            }
+        }
+
+        /* Ambient Background Light Orbs */
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+            animation: pulseOrb 8s ease-in-out infinite alternate;
+        }
+
+        .orb-1 {
+            width: 260px;
+            height: 260px;
+            background: var(--accent-purple);
+            top: -60px;
+            right: -40px;
+        }
+
+        .orb-2 {
+            width: 220px;
+            height: 220px;
+            background: var(--accent-cyan);
+            bottom: 120px;
+            left: -50px;
+            opacity: 0.3;
+        }
+
+        @keyframes pulseOrb {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+
+            100% {
+                transform: scale(1.15) translate(15px, 20px);
+            }
+        }
+
+        /* ==========================================
+       HEADER
+       ========================================== */
+        .app-header {
+            position: relative;
+            z-index: 10;
+            padding: 24px 24px 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-full);
+            background: var(--bg-surface-1);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--inset-glow);
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.92);
+            background: var(--bg-surface-2);
+        }
+
+        .icon-btn.gold-badge {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--accent-gold);
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.2), var(--inset-glow);
+        }
+
+        /* ==========================================
+       MAIN SCROLL AREA
+       ========================================== */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 20px 110px 20px;
+            position: relative;
+            z-index: 5;
+            scrollbar-width: none;
+        }
+
+        .app-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Profile Identity Card */
+        .profile-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: var(--inset-glow), 0 12px 30px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .profile-card:active {
+            transform: scale(0.98);
+            border-color: var(--border-glass-bright);
+        }
+
+        .profile-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 58px;
+            height: 58px;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            border: 2px solid var(--accent-purple);
+            box-shadow: var(--shadow-glow-purple);
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: #10B981;
+            border: 2.5px solid #06080F;
+            border-radius: var(--radius-full);
+        }
+
+        .profile-meta .username {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-icon {
+            color: var(--accent-cyan);
+        }
+
+        .profile-meta .workouts-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chevron-icon {
+            color: var(--text-tertiary);
+            transition: transform var(--duration-fast);
+        }
+
+        .profile-card:hover .chevron-icon {
+            transform: translateX(3px);
+            color: var(--text-primary);
+        }
+
+        /* Dashboard Title Header */
+        .dashboard-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .dashboard-title-row h2 {
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .add-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid var(--border-accent);
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-spring);
+        }
+
+        .add-btn:active {
+            transform: scale(0.9);
+            background: var(--accent-purple);
+            color: #FFF;
+        }
+
+        /* Widget Grid */
+        .widgets-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Glass Widget Card */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(22, 28, 45, 0.6) 0%, rgba(13, 17, 28, 0.7) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--inset-glow), 0 16px 36px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: cardSlideUp 0.4s var(--ease-spring);
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .widget-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .menu-dots-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 6px;
+            margin: -6px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color var(--duration-fast);
+        }
+
+        .menu-dots-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* Bar Chart Component */
+        .chart-box {
+            height: 165px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-top: 20px;
+        }
+
+        .chart-y-axis {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .chart-y-axis span {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .chart-grid {
+            position: absolute;
+            top: 6px;
+            left: 0;
+            right: 20px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .grid-line {
+            width: 100%;
+            border-top: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-bars-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 110px;
+            padding-right: 24px;
+            z-index: 2;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .bar-track {
+            width: 14px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 3px;
+            position: relative;
+        }
+
+        .bar-segment {
+            width: 100%;
+            background: linear-gradient(180deg, var(--accent-purple) 0%, rgba(139, 92, 246, 0.6) 100%);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--accent-purple-glow);
+            transition: height 0.8s var(--ease-spring), transform var(--duration-fast);
+            height: 0%;
+        }
+
+        .bar-group:hover .bar-segment {
+            transform: scaleX(1.2);
+            filter: brightness(1.2);
+        }
+
+        .bar-date {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+
+        /* Goal Tag Pill */
+        .goal-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            color: var(--accent-cyan);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            margin-bottom: 12px;
+        }
+
+        /* Macro & Stat Layouts */
+        .big-metric {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .big-metric span {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+            transition: width 0.8s var(--ease-spring);
+        }
+
+        .macro-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .macro-card-box {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .macro-card-box .label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .macro-card-box .val {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /* ==========================================
+       FLOATING GLASS BOTTOM NAVIGATION DOCK
+       ========================================== */
+        .bottom-nav-dock {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            height: 68px;
+            background: rgba(15, 20, 32, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass-bright);
+            border-radius: var(--radius-full);
+            display: flex;
+            justify-space-around;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 100;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), var(--inset-glow);
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            width: 58px;
+            padding: 8px 0;
+            position: relative;
+            transition: color var(--duration-fast);
+        }
+
+        .nav-tab svg {
+            transition: transform var(--duration-fast) var(--ease-spring), color var(--duration-fast);
+        }
+
+        .nav-tab span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+        }
+
+        .nav-tab.active {
+            color: var(--accent-purple);
+        }
+
+        .nav-tab.active svg {
+            transform: translateY(-2px);
+            color: var(--accent-purple);
+        }
+
+        .active-dot {
+            position: absolute;
+            bottom: 6px;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-purple);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        /* ==========================================
+       MODALS & BOTTOM SHEETS
+       ========================================== */
+        .sheet-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 4, 8, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--duration-normal) var(--ease-spring);
+        }
+
+        .sheet-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bottom-sheet-drawer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0E1322;
+            border-top: 1px solid var(--border-glass-bright);
+            border-radius: 32px 32px 0 0;
+            padding: 12px 24px 36px 24px;
+            z-index: 201;
+            transform: translateY(100%);
+            transition: transform var(--duration-normal) var(--ease-spring);
+            box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.8);
+            max-height: 82vh;
+            overflow-y: auto;
+        }
+
+        .sheet-overlay.active .bottom-sheet-drawer {
+            transform: translateY(0);
+        }
+
+        .drag-pill {
+            width: 38px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-full);
+            margin: 0 auto 20px auto;
+        }
+
+        .sheet-header-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        /* Form Fields */
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .text-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: border-color var(--duration-fast);
+        }
+
+        .text-input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .primary-action-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #7C3AED 100%);
+            color: #FFF;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-glow-purple);
+            transition: all var(--duration-fast) var(--ease-spring);
+            margin-top: 10px;
+        }
+
+        .primary-action-btn:active {
+            transform: scale(0.98);
+            filter: brightness(0.9);
+        }
+
+        /* Option Items in Sheets */
+        .option-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background var(--duration-fast);
+        }
+
+        .option-card:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .option-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .action-row-btn {
+            width: 100%;
+            padding: 15px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .action-row-btn.danger {
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* ==========================================
+       TOAST NOTIFICATION
+       ========================================== */
+        .floating-toast {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: rgba(30, 40, 60, 0.9);
+            border: 1px solid var(--border-glass-bright);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s var(--ease-spring);
+            white-space: nowrap;
+        }
+
+        .floating-toast.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- APP SHELL -->
+    <div class="app-shell">
+
+        <!-- Ambient Blur Lighting Orbs -->
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+
+        <!-- Floating Toast Capsule -->
+        <div id="app-toast" class="floating-toast">Coming next</div>
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <h1>Profile</h1>
+            <div class="header-actions">
+                <button class="icon-btn" aria-label="Settings" onclick="app.showToast('Settings available in Page 2')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+                <button class="icon-btn gold-badge" aria-label="PRO Member"
+                    onclick="app.showToast('PRO Membership Active')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m2 4 3 12h14l3-12-6 7-4-5-4 5-6-7zm3 16h14" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- SCROLLABLE BODY CONTENT -->
+        <main class="app-content">
+
+            <!-- PROFILE IDENTITY CARD -->
+            <div class="profile-card" id="profile-trigger" aria-label="Edit Profile">
+                <div class="profile-left">
+                    <div class="avatar-container">
+                        <img id="user-avatar-img"
+                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250"
+                            alt="Avatar" class="avatar-img">
+                        <div class="status-indicator"></div>
+                    </div>
+                    <div class="profile-meta">
+                        <div class="username">
+                            <span id="user-name-txt">SKV</span>
+                            <svg class="verified-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                        </div>
+                        <div class="workouts-count"><span id="user-workouts-txt">246</span> workouts</div>
+                    </div>
+                </div>
+                <svg class="chevron-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </div>
+
+            <!-- DASHBOARD SECTION -->
+            <div class="dashboard-title-row">
+                <h2>Dashboard</h2>
+                <button class="add-btn" id="open-add-widget-btn" aria-label="Add Widget">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- WIDGETS CONTAINER -->
+            <div class="widgets-stack" id="widgets-container">
+                <!-- Rendered dynamically -->
+            </div>
+
+        </main>
+
+        <!-- FLOATING BOTTOM NAVIGATION DOCK -->
+        <nav class="bottom-nav-dock">
+            <button class="nav-tab active" data-tab="profile">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Profile</span>
+                <div class="active-dot"></div>
+            </button>
+            <button class="nav-tab" data-tab="history">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>History</span>
+            </button>
+            <button class="nav-tab" data-tab="workout">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Workout</span>
+            </button>
+            <button class="nav-tab" data-tab="exercises">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6.5 6.5 11 11" />
+                    <path d="m21 21-1-1" />
+                    <path d="m3 3 1 1" />
+                    <path d="m18 22 4-4" />
+                    <path d="m2 6 4-4" />
+                    <path d="m3 10 7-7" />
+                    <path d="m14 21 7-7" />
+                </svg>
+                <span>Exercises</span>
+            </button>
+            <button class="nav-tab" data-tab="measure">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0l12.6 12.6z" />
+                    <line x1="14.5" y1="12.5" x2="17" y2="10" />
+                    <line x1="11.5" y1="9.5" x2="14" y2="7" />
+                    <line x1="8.5" y1="6.5" x2="11" y2="4" />
+                </svg>
+                <span>Measure</span>
+            </button>
+        </nav>
+
+        <!-- SHEET OVERLAY & BACKDROP -->
+        <div class="sheet-overlay" id="sheet-backdrop">
+
+            <!-- EDIT PROFILE SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-edit-profile" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Edit Profile</div>
+                <form id="form-profile" onsubmit="event.preventDefault(); app.saveProfile();">
+                    <div class="input-group">
+                        <label class="input-label" for="field-username">Username</label>
+                        <input type="text" id="field-username" class="text-input" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="field-workouts">Total Workouts</label>
+                        <input type="number" id="field-workouts" class="text-input" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="field-avatar">Avatar Image URL</label>
+                        <input type="url" id="field-avatar" class="text-input" required>
+                    </div>
+                    <button type="submit" class="primary-action-btn">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- ADD WIDGET SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-add-widget" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Add Widget</div>
+                <div class="option-list" id="available-widgets-list">
+                    <!-- Dynamic widget options -->
+                </div>
+            </div>
+
+            <!-- WIDGET OPTIONS POPUP SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-widget-menu" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title" id="widget-menu-title">Widget Settings</div>
+                <button class="action-row-btn" onclick="app.openGoalModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    Add Goal
+                </button>
+                <button class="action-row-btn danger" onclick="app.deleteSelectedWidget()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    Delete Widget
+                </button>
+            </div>
+
+            <!-- SET GOAL SHEET -->
+            <div class="bottom-sheet-drawer" id="sheet-set-goal" onclick="event.stopPropagation()">
+                <div class="drag-pill"></div>
+                <div class="sheet-header-title">Set Goal</div>
+                <form onsubmit="event.preventDefault(); app.saveGoal();">
+                    <div class="input-group">
+                        <label class="input-label" for="field-goal">Goal Description / Target</label>
+                        <input type="text" id="field-goal" class="text-input" placeholder="e.g. 4 workouts per week"
+                            required>
+                    </div>
+                    <button type="submit" class="primary-action-btn">Save Goal</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const LOCAL_STORAGE_KEY = 'PULSE_FIT_PRO_APP_DATA_V2';
+
+        // Standalone HTML escaping utility
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+        }
+
+        // Widget Registry Definition
+        const WIDGET_REGISTRY = {
+            'workouts-per-week': {
+                id: 'workouts-per-week',
+                name: 'Workouts per week',
+                description: 'Weekly frequency bar chart analysis',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Workouts per week</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('workouts-per-week')" aria-label="Widget Options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          ${goal ? `<div class="goal-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(goal)}</div>` : ''}
+          <div class="chart-box">
+            <div class="chart-grid">
+              <div class="grid-line"></div>
+              <div class="grid-line"></div>
+              <div class="grid-line"></div>
+            </div>
+            <div class="chart-y-axis">
+              <span>2</span>
+              <span>1</span>
+              <span>0</span>
+            </div>
+            <div class="chart-bars-row">
+              <div class="bar-group" onclick="app.showToast('6/28: 0 workouts')"><div class="bar-track"><div class="bar-segment" data-h="0%"></div></div><span class="bar-date">6/28</span></div>
+              <div class="bar-group" onclick="app.showToast('7/5: 1 workout')"><div class="bar-track"><div class="bar-segment" data-h="50%"></div></div><span class="bar-date">7/5</span></div>
+              <div class="bar-group" onclick="app.showToast('7/12: 2 workouts')"><div class="bar-track"><div class="bar-segment" data-h="100%"></div></div><span class="bar-date">7/12</span></div>
+              <div class="bar-group" onclick="app.showToast('7/19: 2 workouts')"><div class="bar-track"><div class="bar-segment" data-h="100%"></div></div><span class="bar-date">7/19</span></div>
+              <div class="bar-group" onclick="app.showToast('7/26: 0 workouts')"><div class="bar-track"><div class="bar-segment" data-h="0%"></div></div><span class="bar-date">7/26</span></div>
+              <div class="bar-group" onclick="app.showToast('8/2: 0 workouts')"><div class="bar-track"><div class="bar-segment" data-h="0%"></div></div><span class="bar-date">8/2</span></div>
+              <div class="bar-group" onclick="app.showToast('8/9: 2 workouts')"><div class="bar-track"><div class="bar-segment" data-h="100%"></div></div><span class="bar-date">8/9</span></div>
+            </div>
+          </div>
+        `
+            },
+            'calories-this-week': {
+                id: 'calories-this-week',
+                name: 'Calories this week',
+                description: 'Active calorie burn tracking against target',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Calories this week</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('calories-this-week')" aria-label="Widget Options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          ${goal ? `<div class="goal-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(goal)}</div>` : ''}
+          <div class="big-metric">3,420 <span>/ 4,500 kcal</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width: 76%;"></div></div>
+        `
+            },
+            'daily-macros': {
+                id: 'daily-macros',
+                name: 'Daily macros',
+                description: 'Protein, carbs, and fat breakdown',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Daily macros</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('daily-macros')" aria-label="Widget Options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          ${goal ? `<div class="goal-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(goal)}</div>` : ''}
+          <div class="macro-grid-container">
+            <div class="macro-card-box"><div class="label">Protein</div><div class="val" style="color:var(--accent-purple)">145g</div></div>
+            <div class="macro-card-box"><div class="label">Carbs</div><div class="val" style="color:var(--accent-cyan)">210g</div></div>
+            <div class="macro-card-box"><div class="label">Fats</div><div class="val" style="color:var(--accent-gold)">58g</div></div>
+          </div>
+        `
+            },
+            'exercises': {
+                id: 'exercises',
+                name: 'Exercises',
+                description: 'Key strength exercises overview',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Exercises Overview</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('exercises')" aria-label="Widget Options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          ${goal ? `<div class="goal-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(goal)}</div>` : ''}
+          <div style="font-size:13px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; color:var(--text-secondary);"><span>Bench Press</span><strong style="color:var(--text-primary)">100 kg × 5</strong></div>
+            <div style="display:flex; justify-content:space-between; color:var(--text-secondary);"><span>Barbell Squat</span><strong style="color:var(--text-primary)">140 kg × 3</strong></div>
+          </div>
+        `
+            },
+            'measure': {
+                id: 'measure',
+                name: 'Measure',
+                description: 'Body weight & circumference metrics',
+                render: (goal) => `
+          <div class="widget-header">
+            <h3>Body Measurement</h3>
+            <button class="menu-dots-btn" onclick="app.openWidgetMenu('measure')" aria-label="Widget Options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          ${goal ? `<div class="goal-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(goal)}</div>` : ''}
+          <div class="big-metric">75.4 <span>kg (-1.2 kg this month)</span></div>
+        `
+            }
+        };
+
+        // Initial Default Data
+        const INITIAL_STATE = {
+            user: {
+                username: 'SKV',
+                workouts: 246,
+                avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250'
+            },
+            widgets: ['workouts-per-week'],
+            goals: {}
+        };
+
+        class PulseFitApp {
+            constructor() {
+                this.initDOM();
+                this.state = this.loadState();
+                this.selectedWidget = null;
+                this.toastTimer = null;
+
+                this.bindEvents();
+                this.renderAll();
+            }
+
+            loadState() {
+                try {
+                    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                    if (!raw) return JSON.parse(JSON.stringify(INITIAL_STATE));
+                    const parsed = JSON.parse(raw);
+                    return {
+                        user: { ...INITIAL_STATE.user, ...(parsed.user || {}) },
+                        widgets: Array.isArray(parsed.widgets) ? parsed.widgets : INITIAL_STATE.widgets,
+                        goals: parsed.goals || {}
+                    };
+                } catch (e) {
+                    return JSON.parse(JSON.stringify(INITIAL_STATE));
+                }
+            }
+
+            saveState() {
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.state));
+                } catch (e) {
+                    console.error('Storage save error:', e);
+                }
+            }
+
+            initDOM() {
+                this.backdrop = document.getElementById('sheet-backdrop');
+                this.sheets = {
+                    editProfile: document.getElementById('sheet-edit-profile'),
+                    addWidget: document.getElementById('sheet-add-widget'),
+                    widgetMenu: document.getElementById('sheet-widget-menu'),
+                    setGoal: document.getElementById('sheet-set-goal')
+                };
+                this.toastEl = document.getElementById('app-toast');
+            }
+
+            bindEvents() {
+                document.getElementById('profile-trigger').addEventListener('click', () => this.openEditProfile());
+                document.getElementById('open-add-widget-btn').addEventListener('click', () => this.openAddWidgetSheet());
+
+                this.backdrop.addEventListener('click', () => this.closeSheets());
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.closeSheets();
+                });
+
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        if (tab.dataset.tab !== 'profile') {
+                            this.showToast('Coming next');
+                        }
+                    });
+                });
+            }
+
+            renderAll() {
+                this.renderProfile();
+                this.renderWidgets();
+            }
+
+            renderProfile() {
+                document.getElementById('user-name-txt').textContent = this.state.user.username;
+                document.getElementById('user-workouts-txt').textContent = this.state.user.workouts;
+                document.getElementById('user-avatar-img').src = this.state.user.avatarUrl;
+            }
+
+            renderWidgets() {
+                const container = document.getElementById('widgets-container');
+                container.innerHTML = '';
+
+                if (!this.state.widgets || this.state.widgets.length === 0) {
+                    container.innerHTML = `
+            <div style="text-align:center; padding: 36px 20px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-glass); border-radius: var(--radius-lg); color: var(--text-tertiary);">
+              <p>No widgets active.</p>
+              <button onclick="app.openAddWidgetSheet()" style="margin-top: 10px; background: none; border: none; color: var(--accent-purple); font-weight: 700; cursor: pointer;">+ Add Widget</button>
+            </div>
+          `;
+                    return;
+                }
+
+                this.state.widgets.forEach(id => {
+                    const item = WIDGET_REGISTRY[id];
+                    if (!item) return;
+
+                    const card = document.createElement('div');
+                    card.className = 'glass-card';
+                    const goal = (this.state.goals && this.state.goals[id]) || null;
+                    card.innerHTML = item.render(goal);
+                    container.appendChild(card);
+                });
+
+                setTimeout(() => {
+                    document.querySelectorAll('.bar-segment').forEach(bar => {
+                        const h = bar.getAttribute('data-h');
+                        if (h) bar.style.height = h;
+                    });
+                }, 60);
+            }
+
+            openSheet(sheetKey) {
+                this.backdrop.classList.add('active');
+                Object.keys(this.sheets).forEach(key => {
+                    this.sheets[key].style.display = (key === sheetKey) ? 'block' : 'none';
+                });
+            }
+
+            closeSheets() {
+                this.backdrop.classList.remove('active');
+            }
+
+            showToast(msg) {
+                if (this.toastTimer) clearTimeout(this.toastTimer);
+                this.toastEl.textContent = msg;
+                this.toastEl.classList.add('visible');
+                this.toastTimer = setTimeout(() => {
+                    this.toastEl.classList.remove('visible');
+                }, 2200);
+            }
+
+            openEditProfile() {
+                document.getElementById('field-username').value = this.state.user.username;
+                document.getElementById('field-workouts').value = this.state.user.workouts;
+                document.getElementById('field-avatar').value = this.state.user.avatarUrl;
+                this.openSheet('editProfile');
+            }
+
+            saveProfile() {
+                const username = document.getElementById('field-username').value.trim();
+                const workouts = parseInt(document.getElementById('field-workouts').value, 10);
+                const avatarUrl = document.getElementById('field-avatar').value.trim();
+
+                if (username && !isNaN(workouts) && avatarUrl) {
+                    this.state.user = { username, workouts, avatarUrl };
+                    this.saveState();
+                    this.renderProfile();
+                    this.closeSheets();
+                    this.showToast('Profile saved');
+                }
+            }
+
+            openAddWidgetSheet() {
+                const list = document.getElementById('available-widgets-list');
+                list.innerHTML = '';
+
+                const unadded = Object.keys(WIDGET_REGISTRY).filter(id => !this.state.widgets.includes(id));
+
+                if (unadded.length === 0) {
+                    list.innerHTML = `<p style="text-align:center; color:var(--text-tertiary); padding:16px 0; font-size:14px;">All widgets added to dashboard.</p>`;
+                } else {
+                    unadded.forEach(id => {
+                        const w = WIDGET_REGISTRY[id];
+                        const opt = document.createElement('div');
+                        opt.className = 'option-card';
+                        opt.onclick = () => this.addWidget(id);
+                        opt.innerHTML = `
+              <div>
+                <div class="option-title">${w.name}</div>
+                <div class="option-sub">${w.description}</div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            `;
+                        list.appendChild(opt);
+                    });
+                }
+
+                this.openSheet('addWidget');
+            }
+
+            addWidget(id) {
+                if (!this.state.widgets.includes(id)) {
+                    this.state.widgets.push(id);
+                    this.saveState();
+                    this.renderWidgets();
+                    this.closeSheets();
+                    this.showToast('Widget added');
+                }
+            }
+
+            openWidgetMenu(id) {
+                this.selectedWidget = id;
+                const w = WIDGET_REGISTRY[id];
+                document.getElementById('widget-menu-title').textContent = w ? w.name : 'Options';
+                this.openSheet('widgetMenu');
+            }
+
+            deleteSelectedWidget() {
+                if (!this.selectedWidget) return;
+                this.state.widgets = this.state.widgets.filter(id => id !== this.selectedWidget);
+                if (this.state.goals) delete this.state.goals[this.selectedWidget];
+                this.saveState();
+                this.renderWidgets();
+                this.closeSheets();
+                this.showToast('Widget deleted');
+            }
+
+            openGoalModal() {
+                const currentGoal = (this.state.goals && this.state.goals[this.selectedWidget]) || '';
+                document.getElementById('field-goal').value = currentGoal;
+                this.openSheet('setGoal');
+            }
+
+            saveGoal() {
+                const val = document.getElementById('field-goal').value.trim();
+                if (this.selectedWidget) {
+                    if (!this.state.goals) this.state.goals = {};
+                    if (val) {
+                        this.state.goals[this.selectedWidget] = val;
+                    } else {
+                        delete this.state.goals[this.selectedWidget];
+                    }
+                    this.saveState();
+                    this.renderWidgets();
+                    this.closeSheets();
+                    this.showToast('Goal updated');
+                }
+            }
+        }
+
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new PulseFitApp();
+        });
+    </script>
+</body>
+
+</html>

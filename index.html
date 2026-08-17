@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEXFIT | Ultimate Fitness & Gym Application</title>
+  <meta name="description" content="Transform your body and mind with ApexFit. Interactive workout planner, BMI & calorie tracker, class schedules, and elite personal trainers.">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Remixicon for modern iconography -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Ambient Glowing Background Elements -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand-logo" id="nav-brand">
+        <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
+        <span>APEX<span>FIT</span></span>
+      </a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#hero" class="active">Home</a></li>
+        <li><a href="#workouts">Workouts</a></li>
+        <li><a href="#calculator">BMI Tracker</a></li>
+        <li><a href="#pricing">Membership</a></li>
+        <li><a href="#classes">Schedule</a></li>
+        <li><a href="#trainers">Trainers</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary" id="btn-login-modal">Sign In</button>
+        <a href="#pricing" class="btn btn-primary">Join ApexFit</a>
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Navigation Menu">
+          <i class="ri-menu-4-line"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-content">
+        <div class="section-badge"><i class="ri-fire-fill"></i> #1 Next-Gen Gym Network</div>
+        <h1>TRANSFORM YOUR BODY, <span class="highlight">ELEVATE YOUR MIND</span></h1>
+        <p class="hero-description">
+          Unlock your peak human potential with state-of-the-art facilities, elite performance coaches, real-time metrics tracking, and customized workout programs.
+        </p>
+        <div class="hero-buttons">
+          <a href="#workouts" class="btn btn-primary"><i class="ri-play-circle-fill"></i> Explore Workouts</a>
+          <a href="#calculator" class="btn btn-secondary"><i class="ri-calculator-line"></i> Calculate BMI</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <h3>5,000+</h3>
+            <p>Active Members</p>
+          </div>
+          <div class="stat-item">
+            <h3>50+</h3>
+            <p>Expert Coaches</p>
+          </div>
+          <div class="stat-item">
+            <h3>120+</h3>
+            <p>Programs</p>
+          </div>
+          <div class="stat-item">
+            <h3>99.4%</h3>
+            <p>Success Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-card-container">
+          <div class="main-hero-card">
+            <div class="card-tag"><i class="ri-heart-pulse-fill"></i> LIVE TRACKING</div>
+            <h3 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Today's Daily Target</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Cardio & Strength Synergy Circuit</p>
+
+            <div style="background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: var(--radius-sm); margin-bottom: 1rem; border: 1px solid var(--border-color);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                <span>Daily Calories Burned</span>
+                <span style="color: var(--primary); font-weight: 700;">640 / 800 kcal</span>
+              </div>
+              <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: 80%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent-neon));"></div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <span style="color: var(--text-dim); font-size: 0.8rem;">HEART RATE</span>
+                <h4 style="font-size: 1.4rem; color: var(--accent-red); margin-top: 0.2rem;"><i class="ri-heart-3-fill"></i> 142 <small style="font-size:0.75rem; color: var(--text-muted);">BPM</small></h4>
+              </div>
+              <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <span style="color: var(--text-dim); font-size: 0.8rem;">WORKOUT TIME</span>
+                <h4 style="font-size: 1.4rem; color: var(--accent-neon); margin-top: 0.2rem;"><i class="ri-time-fill"></i> 48 <small style="font-size:0.75rem; color: var(--text-muted);">MIN</small></h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-badge badge-1">
+            <i class="ri-trophy-fill" style="color: #f59e0b; font-size: 1.75rem;"></i>
+            <div>
+              <strong style="display:block; font-size:0.95rem;">Rank #1 Gym</strong>
+              <small style="color:var(--text-muted)">Voted 2026 Choice</small>
+            </div>
+          </div>
+
+          <div class="floating-badge badge-2">
+            <i class="ri-shield-check-fill" style="color: var(--primary); font-size: 1.75rem;"></i>
+            <div>
+              <strong style="display:block; font-size:0.95rem;">Pro Trainer Verified</strong>
+              <small style="color:var(--text-muted)">Customized Programs</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workout Library Section -->
+    <section id="workouts">
+      <div class="section-header">
+        <span class="section-badge">WORKOUT CATALOG</span>
+        <h2 class="section-title">Explore Custom Routines</h2>
+        <p class="section-subtitle">Tailored workout plans designed by certified fitness experts for all experience levels.</p>
+      </div>
+
+      <div class="category-tabs" id="workout-category-tabs">
+        <button class="tab-btn active" data-category="all">All Routines</button>
+        <button class="tab-btn" data-category="strength">Strength</button>
+        <button class="tab-btn" data-category="hiit">HIIT & Cardio</button>
+        <button class="tab-btn" data-category="calisthenics">Bodyweight</button>
+        <button class="tab-btn" data-category="flexibility">Mobility & Yoga</button>
+      </div>
+
+      <div class="cards-grid" id="workouts-grid">
+        <!-- Dynamic Workout Cards Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- BMI & Calorie Calculator Section -->
+    <section id="calculator">
+      <div class="section-header">
+        <span class="section-badge">INTERACTIVE TOOLS</span>
+        <h2 class="section-title">BMI & Calorie Tracker</h2>
+        <p class="section-subtitle">Calculate your Body Mass Index (BMI) and recommended daily intake to optimize your diet.</p>
+      </div>
+
+      <div class="calculator-box">
+        <div class="calc-inputs">
+          <h3 style="font-family: var(--font-heading); margin-bottom: 1.5rem;"><i class="ri-user-settings-fill" style="color: var(--primary)"></i> Enter Your Body Metrics</h3>
+          
+          <div class="form-group">
+            <label for="calc-gender">Gender</label>
+            <select id="calc-gender" class="form-control">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="calc-age">Age (Years)</label>
+              <input type="number" id="calc-age" class="form-control" value="25" min="12" max="100">
+            </div>
+            <div class="form-group">
+              <label for="calc-activity">Activity Level</label>
+              <select id="calc-activity" class="form-control">
+                <option value="1.2">Sedentary (Little exercise)</option>
+                <option value="1.375" selected>Lightly Active (1-3 days/wk)</option>
+                <option value="1.55">Moderately Active (3-5 days/wk)</option>
+                <option value="1.725">Very Active (6-7 days/wk)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="calc-weight">Weight (kg)</label>
+              <input type="number" id="calc-weight" class="form-control" value="70" min="30" max="250">
+            </div>
+            <div class="form-group">
+              <label for="calc-height">Height (cm)</label>
+              <input type="number" id="calc-height" class="form-control" value="175" min="100" max="230">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="btn-calculate" style="width: 100%; margin-top: 1rem;">
+            <i class="ri-calculator-fill"></i> Calculate Body Metrics
+          </button>
+        </div>
+
+        <div class="calc-result">
+          <span style="color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Calculated Body Mass Index</span>
+          <div class="bmi-val" id="bmi-display">22.9</div>
+          <div class="bmi-category" id="bmi-category-badge">Normal Weight</div>
+
+          <div style="width: 100%; border-top: 1px solid var(--border-color); margin-top: 2rem; padding-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: left;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Daily Maintenance Calories</span>
+              <h4 id="calc-calories" style="font-size: 1.4rem; color: var(--accent-neon);">2,380 kcal</h4>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Goal (Fat Loss Target)</span>
+              <h4 id="calc-cutting" style="font-size: 1.4rem; color: var(--primary);">1,880 kcal</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing / Membership Plans -->
+    <section id="pricing">
+      <div class="section-header">
+        <span class="section-badge">MEMBERSHIP PASS</span>
+        <h2 class="section-title">Flexible Pricing Plans</h2>
+        <p class="section-subtitle">Choose the perfect tier for your fitness journey. No hidden fees. Cancel anytime.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Basic Plan -->
+        <div class="price-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.5rem;">Starter Basic</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Ideal for beginners getting started</p>
+          <div class="price-amount">$29 <span>/ month</span></div>
+          <ul class="feature-list">
+            <li><i class="ri-checkbox-circle-fill"></i> Access to Gym Floor & Equipment</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Locker Room & Sauna Access</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Mobile App Workout Logger</li>
+            <li style="opacity: 0.4;"><i class="ri-close-circle-line"></i> Personal Trainer Sessions</li>
+            <li style="opacity: 0.4;"><i class="ri-close-circle-line"></i> VIP Spa & Recovery Lounge</li>
+          </ul>
+          <button class="btn btn-secondary btn-join-plan" data-plan="Starter Basic">Get Started</button>
+        </div>
+
+        <!-- Pro Plan (Popular) -->
+        <div class="price-card popular">
+          <div class="popular-badge">MOST POPULAR</div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.5rem;">Pro Athlete</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">For dedicated fitness enthusiasts</p>
+          <div class="price-amount" style="color: var(--primary);">$59 <span>/ month</span></div>
+          <ul class="feature-list">
+            <li><i class="ri-checkbox-circle-fill"></i> All Starter Plan Features</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Unlimited Group Fitness Classes</li>
+            <li><i class="ri-checkbox-circle-fill"></i> 2x Free Personal Training Sessions</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Advanced Nutrition Planner</li>
+            <li style="opacity: 0.4;"><i class="ri-close-circle-line"></i> VIP Spa & Cryotherapy Lounge</li>
+          </ul>
+          <button class="btn btn-primary btn-join-plan" data-plan="Pro Athlete">Join Pro Pass</button>
+        </div>
+
+        <!-- Elite VIP Plan -->
+        <div class="price-card">
+          <h3 style="font-family: var(--font-heading); font-size: 1.5rem;">Elite VIP</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">All-inclusive premium experience</p>
+          <div class="price-amount">$99 <span>/ month</span></div>
+          <ul class="feature-list">
+            <li><i class="ri-checkbox-circle-fill"></i> Unlimited 24/7 All-Location Access</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Dedicated Personal Coach (Weekly)</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Full Spa, Steam & Recovery Access</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Custom Meal Prep Delivery Discount</li>
+            <li><i class="ri-checkbox-circle-fill"></i> Free Guest Passes (4/month)</li>
+          </ul>
+          <button class="btn btn-secondary btn-join-plan" data-plan="Elite VIP">Become Elite</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="classes">
+      <div class="section-header">
+        <span class="section-badge">TIMETABLE</span>
+        <h2 class="section-title">Weekly Class Schedule</h2>
+        <p class="section-subtitle">Book your favorite group workout sessions in advance.</p>
+      </div>
+
+      <div class="glass-card" style="padding: 2rem;">
+        <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);" id="day-tabs">
+          <button class="tab-btn active" data-day="Mon">Monday</button>
+          <button class="tab-btn" data-day="Tue">Tuesday</button>
+          <button class="tab-btn" data-day="Wed">Wednesday</button>
+          <button class="tab-btn" data-day="Thu">Thursday</button>
+          <button class="tab-btn" data-day="Fri">Friday</button>
+          <button class="tab-btn" data-day="Sat">Saturday</button>
+        </div>
+
+        <div id="schedule-list" style="display: grid; gap: 1rem;">
+          <!-- Dynamically populated schedule entries -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Trainers Roster Section -->
+    <section id="trainers">
+      <div class="section-header">
+        <span class="section-badge">EXPERT STAFF</span>
+        <h2 class="section-title">Meet Our Certified Coaches</h2>
+        <p class="section-subtitle">Work 1-on-1 with industry experts to hit your goals faster.</p>
+      </div>
+
+      <div class="cards-grid">
+        <div class="glass-card" style="text-align: center;">
+          <div style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #3b82f6); margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #000; font-weight: 800;">
+            AK
+          </div>
+          <h3 style="margin-bottom: 0.25rem;">Alex Vance</h3>
+          <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Head Strength & Powerlifting</span>
+          <p style="margin-top: 1rem; font-size: 0.9rem;">10+ years coaching Olympic lifters and strength athletes.</p>
+          <button class="btn btn-outline btn-book-trainer" data-trainer="Alex Vance" style="margin-top: 1.5rem; width: 100%;">Book Session</button>
+        </div>
+
+        <div class="glass-card" style="text-align: center;">
+          <div style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #ff3366, #ff9900); margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #000; font-weight: 800;">
+            SK
+          </div>
+          <h3 style="margin-bottom: 0.25rem;">Sophia Kai</h3>
+          <span style="color: var(--accent-red); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">HIIT & Functional Fitness</span>
+          <p style="margin-top: 1rem; font-size: 0.9rem;">Specialist in high-intensity conditioning and fat loss.</p>
+          <button class="btn btn-outline btn-book-trainer" data-trainer="Sophia Kai" style="margin-top: 1.5rem; width: 100%;">Book Session</button>
+        </div>
+
+        <div class="glass-card" style="text-align: center;">
+          <div style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #00ff87, #60a5fa); margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #000; font-weight: 800;">
+            MR
+          </div>
+          <h3 style="margin-bottom: 0.25rem;">Marcus Reed</h3>
+          <span style="color: var(--accent-neon); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Calisthenics & Mobility</span>
+          <p style="margin-top: 1rem; font-size: 0.9rem;">Mastering bodyweight strength, joint longevity, and flexibility.</p>
+          <button class="btn btn-outline btn-book-trainer" data-trainer="Marcus Reed" style="margin-top: 1.5rem; width: 100%;">Book Session</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Registration / Booking Modal -->
+  <div class="modal-overlay" id="app-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <h3 style="font-family: var(--font-heading); font-size: 1.75rem; margin-bottom: 0.5rem;" id="modal-title">Join ApexFit Gym</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;" id="modal-subtitle">Fill out your information to activate your pass.</p>
+
+      <form id="modal-form">
+        <div class="form-group">
+          <label for="form-name">Full Name</label>
+          <input type="text" id="form-name" class="form-control" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="form-email">Email Address</label>
+          <input type="email" id="form-email" class="form-control" placeholder="john@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="form-phone">Phone Number</label>
+          <input type="tel" id="form-phone" class="form-control" placeholder="+1 (555) 000-0000" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Confirm Registration</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="brand-logo">
+          <div class="logo-icon"><i class="ri-flashlight-fill"></i></div>
+          <span>APEX<span>FIT</span></span>
+        </a>
+        <p>The premier modern fitness ecosystem for total physical transformation, athletic recovery, and body mastery.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#workouts">Workouts</a></li>
+          <li><a href="#calculator">BMI Calculator</a></li>
+          <li><a href="#pricing">Membership</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Programs</h4>
+        <ul>
+          <li><a href="#workouts">Hypertrophy Strength</a></li>
+          <li><a href="#workouts">HIIT & Endurance</a></li>
+          <li><a href="#workouts">Bodyweight Mastery</a></li>
+          <li><a href="#workouts">Yoga & Alignment</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact & Hours</h4>
+        <ul>
+          <li><i class="ri-map-pin-2-fill"></i> 742 Evergreen Terrace</li>
+          <li><i class="ri-time-fill"></i> Open 24/7 All Days</li>
+          <li><i class="ri-mail-fill"></i> support@apexfit.io</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 APEXFIT Gym Network. All rights reserved.</p>
+      <p>Built for GitHub Repo: <code>skv-index/gym_app</code></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

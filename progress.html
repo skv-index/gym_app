@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Progress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 100px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 12px 20px;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    /* Time Range Selector */
+    .time-selector {
+      display: flex;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 20px;
+      padding: 4px;
+      gap: 2px;
+    }
+
+    .time-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .time-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.3);
+    }
+
+    /* Content Layout */
+    .content-body {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Section Cards Base */
+    .section-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .card-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #10b981;
+      background: #d1fae5;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    /* 2. Strength Progress Line Chart */
+    .exercise-select-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .exercise-dropdown {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      outline: none;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 140px;
+      margin-top: 10px;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* 3. Personal Records Grid */
+    .pr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .pr-box {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .pr-val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .pr-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .pr-subtext {
+      font-size: 0.62rem;
+      color: var(--text-main);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* 4. Training Volume Bar Chart */
+    .volume-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 100px;
+      padding-top: 10px;
+      gap: 8px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 100%;
+      max-width: 24px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, var(--accent-light), var(--accent));
+      border-radius: 12px;
+      transition: height 0.4s ease;
+    }
+
+    .bar-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* 5. Workout Consistency Calendar */
+    .consistency-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .day-cell.active-low {
+      background: #bfdbfe;
+      color: var(--accent-dark);
+      box-shadow: none;
+    }
+
+    .day-cell.active-high {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(42, 130, 228, 0.4);
+    }
+
+    /* 6. Muscle Group Progress */
+    .muscle-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .muscle-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .muscle-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 10px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent-light), var(--accent));
+    }
+
+    /* 7. Key Achievements */
+    .achievement-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .achievement-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .achievement-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .achievement-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .achievement-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 8. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- 1. Header & Time Selector -->
+    <header class="header">
+      <div class="title-row" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 class="title">Progress</h1>
+        <a href="statistics.html" style="color: var(--accent); font-size: 0.85rem; font-weight: 700; text-decoration: none;">Detailed Stats →</a>
+      </div>
+      
+      <div class="time-selector">
+        <button class="time-btn" data-range="week">Week</button>
+        <button class="time-btn active" data-range="month">Month</button>
+        <button class="time-btn" data-range="3months">3 Months</button>
+        <button class="time-btn" data-range="year">Year</button>
+      </div>
+    </header>
+
+    <main class="content-body">
+
+      <!-- 2. Strength Progress -->
+      <section class="section-card">
+        <div class="exercise-select-wrapper">
+          <h2 class="card-title">Strength Progress</h2>
+          <select class="exercise-dropdown" id="exerciseSelect">
+            <option>Bench Press</option>
+            <option>Squat</option>
+            <option>Deadlift</option>
+            <option>Shoulder Press</option>
+          </select>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 8px;">
+          Estimated 1RM: <span style="color: var(--accent-dark); font-weight: 800;">102.5 kg (+7.5%)</span>
+        </div>
+        
+        <div class="chart-container">
+          <svg class="chart-svg" viewBox="0 0 300 120">
+            <!-- Background Grid Lines -->
+            <line x1="0" y1="20" x2="300" y2="20" stroke="#dcebfe" stroke-dasharray="4" stroke-width="1" />
+            <line x1="0" y1="60" x2="300" y2="60" stroke="#dcebfe" stroke-dasharray="4" stroke-width="1" />
+            <line x1="0" y1="100" x2="300" y2="100" stroke="#dcebfe" stroke-dasharray="4" stroke-width="1" />
+            
+            <!-- Area Fill -->
+            <polygon points="10,95 60,80 120,85 180,50 240,40 290,20 290,110 10,110" fill="url(#blue-gradient)" opacity="0.3" />
+            
+            <!-- Line Path -->
+            <path d="M 10 95 Q 60 80, 120 85 T 180 50 T 240 40 T 290 20" fill="none" stroke="var(--accent)" stroke-width="3.5" stroke-linecap="round" />
+            
+            <!-- Data Points -->
+            <circle cx="10" cy="95" r="4" fill="var(--card-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="60" cy="80" r="4" fill="var(--card-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="120" cy="85" r="4" fill="var(--card-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="180" cy="50" r="4" fill="var(--card-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="240" cy="40" r="4" fill="var(--card-bg)" stroke="var(--accent)" stroke-width="2.5"/>
+            <circle cx="290" cy="20" r="5" fill="var(--accent)" stroke="#ffffff" stroke-width="2"/>
+
+            <defs>
+              <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="var(--accent)" />
+                <stop offset="100%" stop-color="var(--bg)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 3. Personal Records -->
+      <section class="section-card">
+        <div class="card-header">
+          <h2 class="card-title">Personal Records</h2>
+          <span class="card-badge">+2 This Month</span>
+        </div>
+        <div class="pr-grid">
+          <div class="pr-box">
+            <div class="pr-val">14</div>
+            <div class="pr-label">Total PRs</div>
+            <div class="pr-subtext">All-time</div>
+          </div>
+          <div class="pr-box">
+            <div class="pr-val">102.5kg</div>
+            <div class="pr-label">Recent PR</div>
+            <div class="pr-subtext">Bench Press</div>
+          </div>
+          <div class="pr-box">
+            <div class="pr-val">160kg</div>
+            <div class="pr-label">Best Lift</div>
+            <div class="pr-subtext">Deadlift</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Training Volume Chart -->
+      <section class="section-card">
+        <div class="card-header">
+          <h2 class="card-title">Training Volume</h2>
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">Total: 42,800 kg</span>
+        </div>
+        <div class="volume-bars">
+          <div class="bar-col">
+            <div class="bar-track"><div class="bar-fill" style="height: 55%;"></div></div>
+            <span class="bar-label">W1</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar-track"><div class="bar-fill" style="height: 70%;"></div></div>
+            <span class="bar-label">W2</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar-track"><div class="bar-fill" style="height: 45%;"></div></div>
+            <span class="bar-label">W3</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar-track"><div class="bar-fill" style="height: 85%;"></div></div>
+            <span class="bar-label">W4</span>
+          </div>
+          <div class="bar-col">
+            <div class="bar-track"><div class="bar-fill" style="height: 100%;"></div></div>
+            <span class="bar-label">W5</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Workout Consistency -->
+      <section class="section-card">
+        <div class="card-header">
+          <h2 class="card-title">Consistency</h2>
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--accent);">18 Days Active</span>
+        </div>
+        <div class="consistency-grid">
+          <div class="day-cell active-high">M</div>
+          <div class="day-cell active-low">T</div>
+          <div class="day-cell">W</div>
+          <div class="day-cell active-high">T</div>
+          <div class="day-cell active-high">F</div>
+          <div class="day-cell active-low">S</div>
+          <div class="day-cell">S</div>
+
+          <div class="day-cell active-high">M</div>
+          <div class="day-cell active-high">T</div>
+          <div class="day-cell">W</div>
+          <div class="day-cell active-low">T</div>
+          <div class="day-cell active-high">F</div>
+          <div class="day-cell">S</div>
+          <div class="day-cell active-low">S</div>
+
+          <div class="day-cell active-high">M</div>
+          <div class="day-cell active-high">T</div>
+          <div class="day-cell active-low">W</div>
+          <div class="day-cell active-high">T</div>
+          <div class="day-cell active-high">F</div>
+          <div class="day-cell">S</div>
+          <div class="day-cell active-high">S</div>
+        </div>
+      </section>
+
+      <!-- 6. Muscle Group Progress -->
+      <section class="section-card">
+        <div class="card-header">
+          <h2 class="card-title">Muscle Group Focus</h2>
+        </div>
+        <div class="muscle-list">
+          <div class="muscle-item">
+            <div class="muscle-meta"><span>Chest</span><span>88% Optimal</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 88%;"></div></div>
+          </div>
+          <div class="muscle-item">
+            <div class="muscle-meta"><span>Back</span><span>92% Optimal</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 92%;"></div></div>
+          </div>
+          <div class="muscle-item">
+            <div class="muscle-meta"><span>Shoulders</span><span>74% Optimal</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 74%;"></div></div>
+          </div>
+          <div class="muscle-item">
+            <div class="muscle-meta"><span>Arms</span><span>80% Optimal</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 80%;"></div></div>
+          </div>
+          <div class="muscle-item">
+            <div class="muscle-meta"><span>Legs</span><span>65% Recovering</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width: 65%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Key Achievements -->
+      <section class="section-card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Achievements</h2>
+        </div>
+        
+        <div class="achievement-card">
+          <div class="achievement-icon">🏆</div>
+          <div>
+            <div class="achievement-title">Century Club</div>
+            <div class="achievement-desc">Benched 100kg+ for 3 reps</div>
+          </div>
+        </div>
+
+        <div class="achievement-card">
+          <div class="achievement-icon">🔥</div>
+          <div>
+            <div class="achievement-title">Consistency Beast</div>
+            <div class="achievement-desc">Completed 4 workouts per week for 1 month</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 8. Bottom Navigation (Progress Active) -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    // Time Range Selector Toggle
+    const timeBtns = document.querySelectorAll('.time-btn');
+    timeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

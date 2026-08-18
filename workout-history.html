@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Workout History</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    /* 2. Monthly Calendar */
+    .calendar-card {
+      margin: 0 20px 16px 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .month-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .weekday-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .day-cell.workout-done {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 3px 8px rgba(42, 130, 228, 0.4);
+    }
+
+    .day-cell.workout-done::after {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 3px;
+    }
+
+    /* 4. Filter Chips */
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 0 20px 16px 20px;
+      scrollbar-width: none;
+    }
+
+    .filter-tags::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .chip-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.4);
+    }
+
+    /* 3. Workout History List */
+    .history-list {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .history-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .history-card:active {
+      transform: scale(0.98);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .workout-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .workout-date {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .status-completed {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .card-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .metric-box {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+
+    .metric-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .metric-val {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .exercises-preview {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px stroke var(--bg);
+    }
+
+    .pr-chip {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+
+    /* 5. Detailed Workout Summary Bottom Sheet */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .exercise-detail-block {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .ex-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .set-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 4px 0;
+      border-bottom: 1px stroke rgba(0,0,0,0.03);
+    }
+
+    /* 6. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header -->
+    <header class="header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="index.html" style="text-decoration: none; color: var(--accent-dark); font-weight: 800; font-size: 1.2rem;">←</a>
+        <h1 class="title">Workout History</h1>
+      </div>
+      <button class="icon-btn" title="Filter Calendar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- 2. Monthly Calendar -->
+    <section class="calendar-card">
+      <div class="calendar-header">
+        <span class="month-title">August 2026</span>
+        <span style="font-size: 0.72rem; font-weight: 700; color: var(--accent);">14 Workouts Completed</span>
+      </div>
+      <div class="calendar-grid">
+        <div class="weekday-label">M</div>
+        <div class="weekday-label">T</div>
+        <div class="weekday-label">W</div>
+        <div class="weekday-label">T</div>
+        <div class="weekday-label">F</div>
+        <div class="weekday-label">S</div>
+        <div class="weekday-label">S</div>
+
+        <!-- Days -->
+        <div class="day-cell workout-done">3</div>
+        <div class="day-cell workout-done">4</div>
+        <div class="day-cell">5</div>
+        <div class="day-cell workout-done">6</div>
+        <div class="day-cell workout-done">7</div>
+        <div class="day-cell">8</div>
+        <div class="day-cell">9</div>
+
+        <div class="day-cell workout-done">10</div>
+        <div class="day-cell workout-done">11</div>
+        <div class="day-cell">12</div>
+        <div class="day-cell workout-done">13</div>
+        <div class="day-cell workout-done">14</div>
+        <div class="day-cell">15</div>
+        <div class="day-cell">16</div>
+
+        <div class="day-cell workout-done">17</div>
+        <div class="day-cell workout-done">18</div>
+        <div class="day-cell">19</div>
+        <div class="day-cell">20</div>
+        <div class="day-cell">21</div>
+        <div class="day-cell">22</div>
+        <div class="day-cell">23</div>
+      </div>
+    </section>
+
+    <!-- 4. Filter Options -->
+    <div class="filter-tags">
+      <button class="chip-btn active" data-filter="all">All</button>
+      <button class="chip-btn" data-filter="strength">Strength</button>
+      <button class="chip-btn" data-filter="hypertrophy">Hypertrophy</button>
+      <button class="chip-btn" data-filter="completed">Completed</button>
+      <button class="chip-btn" data-filter="prs">Personal Records</button>
+    </div>
+
+    <!-- 3. Workout History List -->
+    <main class="history-list" id="historyList">
+
+      <!-- Item 1 -->
+      <article class="history-card" data-category="strength prs completed"
+               data-name="Heavy Chest & Triceps"
+               data-date="Today, Aug 18 • 08:30 AM"
+               data-duration="58 mins"
+               data-volume="8,450 kg"
+               data-pr="Bench Press (102.5kg)"
+               data-details='[
+                 {"name": "Bench Press", "sets": ["100kg x 5", "102.5kg x 3 (PR)", "95kg x 5"]},
+                 {"name": "Incline Dumbbell Press", "sets": ["32kg x 8", "32kg x 8", "30kg x 10"]},
+                 {"name": "Tricep Extension", "sets": ["40kg x 12", "45kg x 10", "45kg x 10"]}
+               ]'>
+        <div class="card-top">
+          <div>
+            <h3 class="workout-name">Heavy Chest & Triceps</h3>
+            <div class="workout-date">Today, Aug 18 • 08:30 AM</div>
+          </div>
+          <span class="status-badge status-completed">Completed</span>
+        </div>
+        <div class="card-metrics">
+          <div class="metric-box">
+            <div class="metric-label">Duration</div>
+            <div class="metric-val">58 mins</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Total Volume</div>
+            <div class="metric-val">8,450 kg</div>
+          </div>
+        </div>
+        <div class="exercises-preview">
+          <span>3 Exercises (Bench Press, Incline DB, Triceps)</span>
+          <span class="pr-chip">🏆 1 PR</span>
+        </div>
+      </article>
+
+      <!-- Item 2 -->
+      <article class="history-card" data-category="hypertrophy completed"
+               data-name="Back & Biceps Hypertrophy"
+               data-date="Yesterday, Aug 17 • 05:45 PM"
+               data-duration="64 mins"
+               data-volume="9,200 kg"
+               data-pr="None"
+               data-details='[
+                 {"name": "Lat Pulldown", "sets": ["65kg x 12", "70kg x 10", "70kg x 10"]},
+                 {"name": "Barbell Row", "sets": ["70kg x 10", "75kg x 8", "75kg x 8"]},
+                 {"name": "Bicep Curl", "sets": ["16kg x 12", "18kg x 10", "18kg x 8"]}
+               ]'>
+        <div class="card-top">
+          <div>
+            <h3 class="workout-name">Back & Biceps Hypertrophy</h3>
+            <div class="workout-date">Yesterday, Aug 17 • 05:45 PM</div>
+          </div>
+          <span class="status-badge status-completed">Completed</span>
+        </div>
+        <div class="card-metrics">
+          <div class="metric-box">
+            <div class="metric-label">Duration</div>
+            <div class="metric-val">64 mins</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Total Volume</div>
+            <div class="metric-val">9,200 kg</div>
+          </div>
+        </div>
+        <div class="exercises-preview">
+          <span>3 Exercises (Lat Pulldown, Barbell Row, Curls)</span>
+        </div>
+      </article>
+
+      <!-- Item 3 -->
+      <article class="history-card" data-category="strength prs completed"
+               data-name="Leg Day - Quads & Calves"
+               data-date="Friday, Aug 14 • 07:15 AM"
+               data-duration="70 mins"
+               data-volume="11,800 kg"
+               data-pr="Squat (140kg)"
+               data-details='[
+                 {"name": "Barbell Squat", "sets": ["120kg x 5", "130kg x 5", "140kg x 3 (PR)"]},
+                 {"name": "Leg Press", "sets": ["180kg x 10", "200kg x 10", "220kg x 8"]}
+               ]'>
+        <div class="card-top">
+          <div>
+            <h3 class="workout-name">Leg Day - Quads & Calves</h3>
+            <div class="workout-date">Friday, Aug 14 • 07:15 AM</div>
+          </div>
+          <span class="status-badge status-completed">Completed</span>
+        </div>
+        <div class="card-metrics">
+          <div class="metric-box">
+            <div class="metric-label">Duration</div>
+            <div class="metric-val">70 mins</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Total Volume</div>
+            <div class="metric-val">11,800 kg</div>
+          </div>
+        </div>
+        <div class="exercises-preview">
+          <span>2 Exercises (Squat, Leg Press)</span>
+          <span class="pr-chip">🏆 1 PR</span>
+        </div>
+      </article>
+
+    </main>
+
+    <!-- 5. Detailed Workout Summary Modal -->
+    <div class="modal-overlay" id="summaryModal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title" id="modalWorkoutName">Workout Details</h3>
+            <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;" id="modalWorkoutDate">Date</div>
+          </div>
+          <button class="modal-close-btn" id="modalClose">✕</button>
+        </div>
+
+        <div class="summary-stats">
+          <div class="stat-card">
+            <div class="stat-val" id="modalDuration">0 mins</div>
+            <div class="stat-label">Duration</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="modalVolume">0 kg</div>
+            <div class="stat-label">Volume</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" id="modalPR">None</div>
+            <div class="stat-label">PRs Hit</div>
+          </div>
+        </div>
+
+        <div id="modalExerciseBlocks">
+          <!-- Dynamically populated sets -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    // Filter Functionality
+    const chipBtns = document.querySelectorAll('.chip-btn');
+    const cards = document.querySelectorAll('.history-card');
+
+    chipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        chipBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+
+        cards.forEach(card => {
+          const categories = card.dataset.category.split(' ');
+          if (filter === 'all' || categories.includes(filter)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Modal Interaction
+    const modal = document.getElementById('summaryModal');
+    const modalClose = document.getElementById('modalClose');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        document.getElementById('modalWorkoutName').textContent = card.dataset.name;
+        document.getElementById('modalWorkoutDate').textContent = card.dataset.date;
+        document.getElementById('modalDuration').textContent = card.dataset.duration;
+        document.getElementById('modalVolume').textContent = card.dataset.volume;
+        document.getElementById('modalPR').textContent = card.dataset.pr;
+
+        const details = JSON.parse(card.dataset.details);
+        const container = document.getElementById('modalExerciseBlocks');
+        
+        container.innerHTML = details.map(ex => `
+          <div class="exercise-detail-block">
+            <div class="ex-header">
+              <span>${ex.name}</span>
+            </div>
+            ${ex.sets.map((s, i) => `
+              <div class="set-row">
+                <span>Set ${i + 1}</span>
+                <span>${s}</span>
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+
+        modal.classList.add('active');
+      });
+    });
+
+    modalClose.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  </script>
+
+</body>
+</html>

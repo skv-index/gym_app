@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Exercise Library</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container Chassis */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* 1. Header Section */
+    .header {
+      padding: 24px 20px 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* 2. Search Bar */
+    .search-container {
+      padding: 0 20px;
+      margin-bottom: 16px;
+    }
+
+    .search-wrapper {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* 3. Filter Chips */
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 0 20px 16px 20px;
+      scrollbar-width: none;
+    }
+
+    .filter-tags::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .chip-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.4);
+    }
+
+    /* 4. Exercise Cards List */
+    .exercise-list {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .exercise-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .exercise-card:active {
+      transform: scale(0.98);
+    }
+
+    .exercise-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .exercise-info {
+      flex: 1;
+    }
+
+    .exercise-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .exercise-meta-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .difficulty-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .diff-beginner {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .diff-intermediate {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .diff-advanced {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* 5. Exercise Detail Bottom Sheet Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .modal-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .modal-meta-card {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-sm);
+      padding: 10px 8px;
+      text-align: center;
+    }
+
+    .modal-meta-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .modal-meta-val {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .instructions-section {
+      margin-bottom: 20px;
+    }
+
+    .instructions-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+
+    .instruction-step {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .step-num {
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .btn-add-workout {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--clay-shadow-float);
+    }
+
+    /* 6. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- 1. Header -->
+    <header class="header">
+      <div>
+        <h1 class="title">Exercises</h1>
+        <p class="subtitle">Discover & add to your routines</p>
+      </div>
+    </header>
+
+    <!-- 2. Search Bar -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search exercises, muscles...">
+      </div>
+    </div>
+
+    <!-- 3. Filter Chips -->
+    <div class="filter-tags">
+      <button class="chip-btn active" data-filter="all">All</button>
+      <button class="chip-btn" data-filter="chest">Chest</button>
+      <button class="chip-btn" data-filter="back">Back</button>
+      <button class="chip-btn" data-filter="shoulders">Shoulders</button>
+      <button class="chip-btn" data-filter="arms">Arms</button>
+      <button class="chip-btn" data-filter="legs">Legs</button>
+      <button class="chip-btn" data-filter="core">Core</button>
+    </div>
+
+    <!-- 4. Exercise Cards List -->
+    <main class="exercise-list" id="exerciseList">
+      
+      <article class="exercise-card" data-category="chest" data-name="Bench Press" data-target="Chest, Triceps" data-equipment="Barbell" data-diff="Intermediate" data-icon="🏋️‍♂️" data-instructions='["Lie on the bench with feet flat on the floor.", "Grasp barbell slightly wider than shoulder-width.", "Lower bar to mid-chest with control.", "Press explosively back to starting position."]'>
+        <div class="exercise-icon-box">🏋️‍♂️</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Bench Press</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Chest</span>
+            <span class="meta-tag">Barbell</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="chest" data-name="Incline Dumbbell Press" data-target="Upper Chest" data-equipment="Dumbbells" data-diff="Beginner" data-icon="🏋️" data-instructions='["Set bench to a 30-45 degree incline.", "Hold dumbbells at chest height.", "Press dumbbells overhead until arms are extended.", "Lower slowly back to upper chest level."]'>
+        <div class="exercise-icon-box">🏋️</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Incline Dumbbell Press</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Chest</span>
+            <span class="meta-tag">Dumbbells</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="back" data-name="Lat Pulldown" data-target="Lats, Biceps" data-equipment="Cable Machine" data-diff="Beginner" data-icon="🧗" data-instructions='["Sit at pulldown station and secure thighs under pads.", "Grasp wide bar with overhand grip.", "Pull bar down to upper chest while depressing shoulder blades.", "Return bar slowly to full stretch."]'>
+        <div class="exercise-icon-box">🧗</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Lat Pulldown</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Back</span>
+            <span class="meta-tag">Cable</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="back" data-name="Barbell Row" data-target="Upper Back, Lats" data-equipment="Barbell" data-diff="Intermediate" data-icon="🚣" data-instructions='["Hinge at hips with back straight at ~45 degree angle.", "Hold bar with overhand shoulder-width grip.", "Pull bar towards upper waist, squeezing shoulder blades.", "Lower under control back to full arm extension."]'>
+        <div class="exercise-icon-box">🚣</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Barbell Row</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Back</span>
+            <span class="meta-tag">Barbell</span>
+            <span class="difficulty-badge diff-intermediate">Intermediate</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="shoulders" data-name="Shoulder Press" data-target="Deltoids, Triceps" data-equipment="Dumbbells" data-diff="Beginner" data-icon="🙆‍♂️" data-instructions='["Sit upright holding dumbbells at ear level.", "Press dumbbells straight up overhead without locking elbows.", "Pause briefly at peak.", "Lower dumbbells back to ear height with control."]'>
+        <div class="exercise-icon-box">🙆‍♂️</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Shoulder Press</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Shoulders</span>
+            <span class="meta-tag">Dumbbells</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="shoulders" data-name="Lateral Raise" data-target="Side Delts" data-equipment="Dumbbells" data-diff="Beginner" data-icon="🦅" data-instructions='["Stand tall holding light dumbbells at sides.", "Raise arms laterally with soft elbow bend until parallel with floor.", "Pause at shoulder height.", "Lower arms smoothly back to sides."]'>
+        <div class="exercise-icon-box">🦅</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Lateral Raise</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Shoulders</span>
+            <span class="meta-tag">Dumbbells</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="arms" data-name="Bicep Curl" data-target="Biceps" data-equipment="Dumbbells" data-diff="Beginner" data-icon="💪" data-instructions='["Stand holding dumbbells with palms facing forward.", "Keep elbows tucked tight to your sides.", "Curl weights upward toward shoulders.", "Squeeze biceps at top and lower under control."]'>
+        <div class="exercise-icon-box">💪</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Bicep Curl</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Arms</span>
+            <span class="meta-tag">Dumbbells</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="arms" data-name="Tricep Extension" data-target="Triceps" data-equipment="Cable / Rope" data-diff="Beginner" data-icon="⚡" data-instructions='["Attach rope to high pulley.", "Keep elbows pinned to sides.", "Push rope downwards, spreading handles apart at bottom.", "Return slowly to 90-degree elbow angle."]'>
+        <div class="exercise-icon-box">⚡</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Tricep Extension</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Arms</span>
+            <span class="meta-tag">Cable</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="legs" data-name="Squat" data-target="Quads, Glutes" data-equipment="Barbell" data-diff="Advanced" data-icon="🦵" data-instructions='["Rest barbell across upper back shoulders.", "Stand shoulder-width apart.", "Hinge hips back and bend knees down to parallel depth.", "Drive upward through mid-foot back to standing."]'>
+        <div class="exercise-icon-box">🦵</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Squat</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Legs</span>
+            <span class="meta-tag">Barbell</span>
+            <span class="difficulty-badge diff-advanced">Advanced</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="exercise-card" data-category="legs" data-name="Leg Press" data-target="Quads, Hamstrings" data-equipment="Machine" data-diff="Beginner" data-icon="🦿" data-instructions='["Sit on leg press machine with feet hip-width on sled.", "Release safety bars and lower platform toward chest.", "Stop when knees reach 90 degrees.", "Press platform back up through heels."]'>
+        <div class="exercise-icon-box">🦿</div>
+        <div class="exercise-info">
+          <h3 class="exercise-name">Leg Press</h3>
+          <div class="exercise-meta-chips">
+            <span class="meta-tag">Legs</span>
+            <span class="meta-tag">Machine</span>
+            <span class="difficulty-badge diff-beginner">Beginner</span>
+          </div>
+        </div>
+      </article>
+
+    </main>
+
+    <!-- 5. Exercise Detail Modal / Bottom Sheet -->
+    <div class="modal-overlay" id="exerciseModal">
+      <div class="modal-sheet" style="max-height: 85vh; overflow-y: auto;">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <div class="modal-icon-box" id="modalIcon">🏋️‍♂️</div>
+            <h3 class="modal-title" id="modalName">Bench Press</h3>
+          </div>
+          <button class="modal-close-btn" id="modalClose">✕</button>
+        </div>
+
+        <!-- Video Demonstration Player -->
+        <div style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 14px; overflow: hidden; margin-bottom: 14px;">
+          <video id="modalVideoPlayer" controls autoplay loop muted style="width: 100%; height: 100%; object-fit: cover;" poster="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&auto=format&fit=crop&q=80">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-man-doing-bench-press-exercise-41225-large.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div class="modal-meta-grid">
+          <div class="modal-meta-card">
+            <div class="modal-meta-label">Target</div>
+            <div class="modal-meta-val" id="modalTarget">Chest</div>
+          </div>
+          <div class="modal-meta-card">
+            <div class="modal-meta-label">Equipment</div>
+            <div class="modal-meta-val" id="modalEquipment">Barbell</div>
+          </div>
+          <div class="modal-meta-card">
+            <div class="modal-meta-label">Difficulty</div>
+            <div class="modal-meta-val" id="modalDiff">Medium</div>
+          </div>
+        </div>
+
+        <div style="margin: 12px 0;">
+          <h4 style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Description</h4>
+          <p style="font-size: 0.82rem; font-weight: 600; color: var(--text-main); line-height: 1.4; margin-top: 4px;" id="modalDescription">
+            A fundamental compound pushing movement targeting the pectoral muscles, front deltoids, and triceps for upper body strength and muscle growth.
+          </p>
+        </div>
+
+        <div class="instructions-section">
+          <h4 class="instructions-title">How to Perform</h4>
+          <div id="modalInstructions">
+            <!-- Dynamically injected steps -->
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; margin: 12px 0;">
+          <div style="background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; padding: 8px 12px; border-radius: 8px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #047857; display: block;">💡 Form Tip</span>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-main);" id="modalFormTip">Keep shoulder blades retracted and feet firmly planted.</span>
+          </div>
+
+          <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 8px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #b91c1c; display: block;">⚠️ Common Mistake</span>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-main);" id="modalMistake">Flaring elbows out to 90 degrees or bouncing the bar off the chest.</span>
+          </div>
+        </div>
+
+        <button class="btn-add-workout" id="addToWorkoutBtn">+ Add to Active Workout</button>
+      </div>
+    </div>
+
+    <!-- 6. Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    // Search Filtering
+    const searchInput = document.getElementById('searchInput');
+    const exerciseCards = document.querySelectorAll('.exercise-card');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      exerciseCards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const target = card.dataset.target.toLowerCase();
+        const equip = card.dataset.equipment.toLowerCase();
+        if (name.includes(query) || target.includes(query) || equip.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Category Chip Filtering
+    const chipBtns = document.querySelectorAll('.chip-btn');
+    chipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        chipBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+
+        exerciseCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Modal Interaction
+    const modal = document.getElementById('exerciseModal');
+    const modalClose = document.getElementById('modalClose');
+    const addToWorkoutBtn = document.getElementById('addToWorkoutBtn');
+
+    exerciseCards.forEach(card => {
+      card.addEventListener('click', () => {
+        document.getElementById('modalIcon').textContent = card.dataset.icon;
+        document.getElementById('modalName').textContent = card.dataset.name;
+        document.getElementById('modalTarget').textContent = card.dataset.target;
+        document.getElementById('modalEquipment').textContent = card.dataset.equipment;
+        document.getElementById('modalDiff').textContent = card.dataset.diff;
+
+        const instructions = JSON.parse(card.dataset.instructions);
+        const instructionsContainer = document.getElementById('modalInstructions');
+        instructionsContainer.innerHTML = instructions.map((step, idx) => `
+          <div class="instruction-step">
+            <span class="step-num">${idx + 1}.</span>
+            <span>${step}</span>
+          </div>
+        `).join('');
+
+        modal.classList.add('active');
+      });
+    });
+
+    modalClose.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+
+    addToWorkoutBtn.addEventListener('click', () => {
+      alert(`${document.getElementById('modalName').textContent} added to active workout!`);
+      modal.classList.remove('active');
+      window.location.href = 'activeworkout.html';
+    });
+  </script>
+
+</body>
+</html>

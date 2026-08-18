@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Claymorphism Dashboard</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4; /* Electric Clay Blue */
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-button:
+        6px 6px 14px #b0ccf0,
+        -6px -6px 14px #ffffff,
+        inset 3px 3px 6px rgba(255, 255, 255, 0.4),
+        inset -3px -3px 6px rgba(0, 0, 0, 0.15);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container Chassis */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 95px;
+    }
+
+    /* Header Section */
+    .header {
+      padding: 24px 20px 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      padding: 3px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .greeting {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      color: var(--accent);
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 11px;
+      right: 11px;
+      width: 8px;
+      height: 8px;
+      background-color: #ff4757;
+      border-radius: 50%;
+      border: 2px solid var(--card-bg);
+    }
+
+    /* Main Dashboard Content Layout */
+    .dashboard-content {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Shared Clay Card Styling */
+    .card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    .section-title span {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* 1. Today's Workout Card */
+    .workout-card {
+      background: linear-gradient(135deg, #3a8df3, #1e62d0);
+      color: #ffffff;
+      box-shadow: 
+        10px 10px 20px #b8cde6,
+        -10px -10px 20px #ffffff,
+        inset 3px 3px 6px rgba(255, 255, 255, 0.4),
+        inset -3px -3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .workout-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .workout-meta {
+      display: flex;
+      gap: 16px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .workout-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 10px;
+      margin-bottom: 18px;
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 35%;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 2px 0 6px rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-start {
+      width: 100%;
+      background: #ffffff;
+      color: var(--accent-dark);
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transition: transform 0.1s ease;
+    }
+
+    .btn-start:active {
+      transform: scale(0.98);
+    }
+
+    /* 2. Quick Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .stat-unit {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 3. Weekly Activity Chart */
+    .chart-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 110px;
+      padding: 12px 6px 0 6px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--clay-shadow-inset);
+    }
+
+    .chart-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      justify-content: flex-end;
+      padding-bottom: 8px;
+    }
+
+    .bar-wrapper {
+      width: 14px;
+      height: 65px;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .bar {
+      width: 100%;
+      border-radius: 10px;
+      background: var(--accent);
+      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4);
+    }
+
+    .bar.inactive {
+      background: #cbd5e1;
+    }
+
+    .day-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .day-label.active {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* 4. Current Goals */
+    .goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .goal-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .goal-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .goal-pct {
+      color: var(--accent);
+    }
+
+    .goal-progress-bg {
+      width: 100%;
+      height: 12px;
+      background: var(--bg);
+      border-radius: 10px;
+      box-shadow: var(--clay-shadow-inset);
+      padding: 2px;
+    }
+
+    .goal-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-light), var(--accent));
+      border-radius: 8px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    }
+
+    /* 5. Recent Activity List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+    }
+
+    .activity-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .activity-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .activity-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .activity-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .activity-stats {
+      text-align: right;
+    }
+
+    .activity-duration {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .activity-volume {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 6. Fixed Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 24px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="header">
+      <div class="header-user">
+        <a href="settings.html" class="avatar" title="Open Settings">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Profile Picture">
+        </a>
+        <div>
+          <h1 class="greeting">Good morning, Alex</h1>
+          <p class="subtitle">Push harder than yesterday 🔥</p>
+        </div>
+      </div>
+      <a href="settings.html" class="icon-btn" aria-label="Settings">
+        <div class="notification-dot"></div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </a>
+    </header>
+
+    <main class="dashboard-content">
+      
+      <!-- Today's Workout Card -->
+      <section class="card workout-card">
+        <span class="badge">Today's Session</span>
+        <h2 class="workout-title">Upper Body Hypertrophy</h2>
+        <div class="workout-meta">
+          <div class="workout-meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>~50 min</span>
+          </div>
+          <div class="workout-meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16"></path>
+            </svg>
+            <span>6 Exercises</span>
+          </div>
+        </div>
+        
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill"></div>
+        </div>
+
+        <a href="activeworkout.html" class="btn-start" style="text-decoration: none;">
+          <span>Start Workout</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        </a>
+      </section>
+
+      <!-- Daily Activity Tracking -->
+      <section class="card" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="section-title" style="margin-bottom: 0;">
+          <span>Activity Tracking</span>
+          <a href="settings.html" id="trackingStatusIndicator" style="text-decoration: none; font-size: 0.75rem; font-weight: 800; color: #10b981;">
+            ● Step Tracking Active
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <!-- Daily Steps Card -->
+          <a href="leaderboard.html" id="stepsWidgetCard" class="card" style="background: var(--bg); box-shadow: var(--clay-shadow-inset); text-decoration: none; color: inherit; padding: 14px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.68rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Daily Steps</span>
+              <span style="font-size: 1.1rem;">👟</span>
+            </div>
+            <div style="margin-top: 8px;">
+              <div id="stepsValText" style="font-size: 1.3rem; font-weight: 800;">8,450</div>
+              <div id="stepsGoalText" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-top: 2px;">/ 10,000 steps</div>
+            </div>
+            <div style="margin-top: 10px;">
+              <div style="height: 6px; background: rgba(0,0,0,0.08); border-radius: 6px; overflow: hidden;">
+                <div id="stepsBarFill" style="height: 100%; width: 84.5%; background: var(--accent); border-radius: 6px;"></div>
+              </div>
+              <div id="stepsPctText" style="font-size: 0.65rem; font-weight: 800; color: var(--accent); margin-top: 4px;">84.5% of daily goal</div>
+            </div>
+          </a>
+
+          <!-- Daily Active Calories Card -->
+          <a href="leaderboard.html" id="caloriesWidgetCard" class="card" style="background: var(--bg); box-shadow: var(--clay-shadow-inset); text-decoration: none; color: inherit; padding: 14px; margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.68rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Active Calories</span>
+              <span style="font-size: 1.1rem;">🔥</span>
+            </div>
+            <div style="margin-top: 8px;">
+              <div id="caloriesValText" style="font-size: 1.3rem; font-weight: 800; color: #f59e0b;">520 kcal</div>
+              <div id="caloriesSubText" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-top: 2px;">Today's activity</div>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.65rem; font-weight: 800; color: #10b981;">
+              ▲ +15% vs yesterday
+            </div>
+          </a>
+        </div>
+
+        <!-- Prototype Demo Control Container -->
+        <div style="background: rgba(42, 130, 228, 0.08); border: 1px dashed var(--accent); border-radius: 12px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">Prototype Control</span>
+          <button id="demoStepsBtn" style="background: var(--accent); color: #fff; border: none; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">
+            Demo: +500 Steps
+          </button>
+        </div>
+      </section>
+
+      <!-- Quick Stats Grid -->
+      <section class="stats-grid">
+        <a href="leaderboard.html" class="stat-card" style="text-decoration: none; color: inherit;">
+          <div class="stat-header">
+            <span>STREAK</span>
+            <div class="stat-icon" style="color: #ff9f43;">⚡</div>
+          </div>
+          <div class="stat-value">5 <span class="stat-unit">days</span></div>
+        </a>
+
+        <a href="workouts.html" class="stat-card" style="text-decoration: none; color: inherit;">
+          <div class="stat-header">
+            <span>THIS WEEK</span>
+            <div class="stat-icon" style="color: var(--accent);">🏋️</div>
+          </div>
+          <div class="stat-value">4 <span class="stat-unit">sessions</span></div>
+        </a>
+
+        <a href="progress.html" class="stat-card" style="text-decoration: none; color: inherit;">
+          <div class="stat-header">
+            <span>VOLUME</span>
+            <div class="stat-icon" style="color: #00d2d3;">📊</div>
+          </div>
+          <div class="stat-value">12.4k <span class="stat-unit">kg</span></div>
+        </a>
+
+        <a href="statistics.html" class="stat-card" style="text-decoration: none; color: inherit;">
+          <div class="stat-header">
+            <span>RECORDS</span>
+            <div class="stat-icon" style="color: #ff4757;">🏆</div>
+          </div>
+          <div class="stat-value">2 <span class="stat-unit">new PRs</span></div>
+        </a>
+      </section>
+
+      <!-- Weekly Activity -->
+      <section class="card">
+        <div class="section-title">
+          Weekly Activity
+          <a href="statistics.html" style="color: var(--accent); font-size: 0.8rem; font-weight: 700; text-decoration: none;">Details</a>
+        </div>
+        <div class="chart-container">
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar" style="height: 60%;"></div></div>
+            <span class="day-label">M</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar" style="height: 85%;"></div></div>
+            <span class="day-label">T</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar inactive" style="height: 20%;"></div></div>
+            <span class="day-label">W</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar" style="height: 100%;"></div></div>
+            <span class="day-label">T</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar" style="height: 40%;"></div></div>
+            <span class="day-label active">F</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar inactive" style="height: 0%;"></div></div>
+            <span class="day-label">S</span>
+          </div>
+          <div class="chart-col">
+            <div class="bar-wrapper"><div class="bar inactive" style="height: 0%;"></div></div>
+            <span class="day-label">S</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current Goals -->
+      <section class="card">
+        <div class="section-title">
+          Current Goals
+          <a href="goals.html" style="color: var(--accent); font-size: 0.8rem; font-weight: 700; text-decoration: none;">View All</a>
+        </div>
+        <div class="goals-list">
+          
+          <div class="goal-item">
+            <div class="goal-info">
+              <span>Weekly Target (4/5)</span>
+              <span class="goal-pct">80%</span>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <div class="goal-item">
+            <div class="goal-info">
+              <span>Bench Press Goal (90/100 kg)</span>
+              <span class="goal-pct">90%</span>
+            </div>
+            <div class="goal-progress-bg">
+              <div class="goal-progress-fill" style="width: 90%;"></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Recent Activity -->
+      <section class="card" style="padding-bottom: 8px;">
+        <div class="section-title">
+          Recent Activity
+          <a href="workout-history.html" style="color: var(--accent); font-size: 0.8rem; font-weight: 700; text-decoration: none;">View All</a>
+        </div>
+        <div class="activity-list">
+          
+          <div class="activity-item">
+            <div class="activity-details">
+              <div class="activity-icon">🪵</div>
+              <div>
+                <div class="activity-name">Legs & Core</div>
+                <div class="activity-date">Yesterday • 18:30</div>
+              </div>
+            </div>
+            <div class="activity-stats">
+              <div class="activity-duration">55 min</div>
+              <div class="activity-volume">4,200 kg</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-details">
+              <div class="activity-icon">💪</div>
+              <div>
+                <div class="activity-name">Pull Focus</div>
+                <div class="activity-date">Oct 24 • 07:15</div>
+              </div>
+            </div>
+            <div class="activity-stats">
+              <div class="activity-duration">45 min</div>
+              <div class="activity-volume">3,850 kg</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Community & Leaderboard Section -->
+      <section class="card" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff;">
+        <div class="section-title" style="color: #fff;">
+          <span>Community Rank</span>
+          <a href="leaderboard.html" style="color: var(--accent-light); font-size: 0.8rem; font-weight: 700; text-decoration: none;">Leaderboard →</a>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+          <div>
+            <div style="font-size: 1.2rem; font-weight: 800;">#4 Global Rank</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 2px;">2,450 XP this month</div>
+          </div>
+          <div style="font-size: 2rem;">🏆</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Standardized 5-Tab Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="app-state.js"></script>
+  <script>
+    function renderDashboardState() {
+      const state = GymState.get();
+      
+      // Status indicator
+      const statusEl = document.getElementById('trackingStatusIndicator');
+      if (statusEl) {
+        if (state.stepTrackingEnabled) {
+          statusEl.textContent = '● Step Tracking Active';
+          statusEl.style.color = '#10b981';
+        } else {
+          statusEl.textContent = '○ Step Tracking Off';
+          statusEl.style.color = '#64748b';
+        }
+      }
+
+      // Steps widget
+      const stepsVal = document.getElementById('stepsValText');
+      const stepsGoal = document.getElementById('stepsGoalText');
+      const stepsFill = document.getElementById('stepsBarFill');
+      const stepsPct = document.getElementById('stepsPctText');
+
+      if (state.stepTrackingEnabled) {
+        const goal = state.dailyStepGoal || 10000;
+        const current = state.dailySteps || 0;
+        const pct = Math.min(100, Math.round((current / goal) * 1000) / 10);
+        if (stepsVal) stepsVal.textContent = current.toLocaleString();
+        if (stepsGoal) stepsGoal.textContent = `/ ${goal.toLocaleString()} steps`;
+        if (stepsFill) stepsFill.style.width = `${pct}%`;
+        if (stepsPct) stepsPct.textContent = `${pct}% of daily goal`;
+      } else {
+        if (stepsVal) stepsVal.textContent = 'Step Tracking Off';
+        if (stepsGoal) stepsGoal.textContent = 'Disabled in Settings';
+        if (stepsFill) stepsFill.style.width = '0%';
+        if (stepsPct) stepsPct.textContent = 'Tap to configure Settings';
+      }
+
+      // Calories widget
+      const calVal = document.getElementById('caloriesValText');
+      const calSub = document.getElementById('caloriesSubText');
+      if (state.activityCaloriesEnabled) {
+        if (calVal) calVal.textContent = `${state.dailyCalories || 520} kcal`;
+        if (calSub) calSub.textContent = "Today's activity";
+      } else {
+        if (calVal) calVal.textContent = 'Activity Calories — Off';
+        if (calSub) calSub.textContent = 'Disabled in Settings';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDashboardState();
+
+      const demoBtn = document.getElementById('demoStepsBtn');
+      demoBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const state = GymState.get();
+        if (!state.stepTrackingEnabled) {
+          alert('Step Tracking is currently OFF in Settings. Enable it to add steps!');
+          return;
+        }
+        GymState.addDemoSteps(500);
+      });
+
+      window.addEventListener('appStateChanged', () => {
+        renderDashboardState();
+      });
+    });
+  </script>
+
+</body>
+</html>

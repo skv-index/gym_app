@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Workouts</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container Chassis */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 110px;
+    }
+
+    /* Header Section */
+    .header {
+      padding: 24px 20px 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--accent);
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:active {
+      box-shadow: var(--clay-shadow-inset);
+    }
+
+    /* Search Bar Drawer */
+    .search-bar-container {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), margin 0.3s ease;
+      margin-bottom: 0;
+    }
+
+    .search-bar-container.open {
+      max-height: 80px;
+      margin-bottom: 16px;
+    }
+
+    .search-input-wrapper {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-input-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Content Layout */
+    .workouts-content {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Shared Card Styling */
+    .card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    /* 2. Featured / Current Routine */
+    .featured-card {
+      background: linear-gradient(135deg, #3a8df3, #1e62d0);
+      color: #ffffff;
+      box-shadow: 
+        10px 10px 20px #b8cde6,
+        -10px -10px 20px #ffffff,
+        inset 3px 3px 6px rgba(255, 255, 255, 0.4),
+        inset -3px -3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+
+    .program-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .program-subtitle {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 60%;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 2px 0 6px rgba(255, 255, 255, 0.5);
+    }
+
+    .week-chips {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .day-chip {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .day-chip.completed {
+      background: #ffffff;
+      color: var(--accent-dark);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .day-chip.today {
+      border: 2px solid #ffffff;
+      font-weight: 800;
+    }
+
+    /* Category Filter Tags */
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filter-tags::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tag-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tag-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.4);
+    }
+
+    /* 3. Workout Cards Grid */
+    .workout-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .workout-item-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    .workout-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .workout-name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .workout-meta-chips {
+      display: flex;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .exercise-preview-list {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0, 1, 0, 1);
+    }
+
+    .workout-item-card.expanded .exercise-preview-list {
+      max-height: 200px;
+      opacity: 1;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    .exercise-item {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .exercise-item span {
+      color: var(--text-muted);
+    }
+
+    .workout-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-toggle-details {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn-start-workout {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease;
+    }
+
+    .btn-start-workout:active {
+      transform: scale(0.96);
+    }
+
+    /* 4. Workout Templates Section */
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .template-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px;
+      cursor: pointer;
+    }
+
+    .template-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .template-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 5. Floating Action Button (+ Create Workout) */
+    .fab-btn {
+      position: fixed;
+      bottom: 85px;
+      right: calc(50% - 195px); /* Center within 430px chassis */
+      background: linear-gradient(135deg, var(--accent-light), var(--accent));
+      color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 22px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--clay-shadow-float);
+      cursor: pointer;
+      z-index: 90;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    @media (max-width: 430px) {
+      .fab-btn {
+        right: 20px;
+      }
+    }
+
+    .fab-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Interactive Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .modal-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .modal-input {
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    /* 6. Fixed Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 24px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- 1. Header -->
+    <header class="header">
+      <div>
+        <h1 class="title">Workouts</h1>
+        <p class="subtitle">Select or build your routine</p>
+      </div>
+      <button class="icon-btn" id="searchToggleBtn" aria-label="Search Workouts">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Interactive Search Bar Drawer -->
+    <div class="search-bar-container" id="searchBarContainer">
+      <div class="search-input-wrapper">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search workouts or exercises...">
+      </div>
+    </div>
+
+    <main class="workouts-content">
+      
+      <!-- 2. Featured / Current Routine -->
+      <section class="card featured-card">
+        <span class="badge">Active Program</span>
+        <h2 class="program-title">Hypertrophy Block A</h2>
+        <p class="program-subtitle">4-Day Upper / Lower Split</p>
+        
+        <div class="progress-info">
+          <span>Week 3 of 6</span>
+          <span>60%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill"></div>
+        </div>
+
+        <div class="week-chips">
+          <div class="day-chip completed">M</div>
+          <div class="day-chip completed">T</div>
+          <div class="day-chip">W</div>
+          <div class="day-chip today">T</div>
+          <div class="day-chip">F</div>
+          <div class="day-chip">S</div>
+          <div class="day-chip">S</div>
+        </div>
+      </section>
+
+      <!-- Category Filter Tags -->
+      <div class="filter-tags">
+        <button class="tag-btn active" data-filter="all">All</button>
+        <button class="tag-btn" data-filter="push">Push</button>
+        <button class="tag-btn" data-filter="pull">Pull</button>
+        <button class="tag-btn" data-filter="legs">Legs</button>
+        <button class="tag-btn" data-filter="full">Full Body</button>
+      </div>
+
+      <!-- 3. Workout Cards Grid -->
+      <section class="workout-cards-list" id="workoutList">
+        
+        <!-- Push Day Card -->
+        <article class="workout-item-card" data-category="push">
+          <div class="workout-header">
+            <h3 class="workout-name">Push Day Heavy</h3>
+            <span class="badge" style="background: var(--accent-bg); color: var(--accent-dark);">Chest / Shoulders</span>
+          </div>
+          <div class="workout-meta-chips">
+            <span>⏱ ~55 min</span>
+            <span>🏋️ 5 Exercises</span>
+            <span style="background: rgba(42,130,228,0.15); color: var(--accent-dark); font-weight: 800; padding: 2px 8px; border-radius: 10px;">🎥 Video Guide</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin: 8px 0;">
+            "Chest, shoulders and triceps focused heavy strength & hypertrophy block."
+          </p>
+          <div class="exercise-preview-list">
+            <div class="exercise-item">1. Barbell Bench Press <span>4 Sets</span></div>
+            <div class="exercise-item">2. Overhead Dumbbell Press <span>3 Sets</span></div>
+            <div class="exercise-item">3. Incline DB Flyes <span>3 Sets</span></div>
+            <div class="exercise-item">4. Lateral Raises <span>4 Sets</span></div>
+            <div class="exercise-item">5. Triceps Rope Pushdown <span>3 Sets</span></div>
+          </div>
+          <div class="workout-actions">
+            <button class="btn-toggle-details">Details</button>
+            <button class="btn-start-workout">
+              Start
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+        <!-- Pull Day Card -->
+        <article class="workout-item-card" data-category="pull">
+          <div class="workout-header">
+            <h3 class="workout-name">Pull Focus & Biceps</h3>
+            <span class="badge" style="background: var(--accent-bg); color: var(--accent-dark);">Back / Biceps</span>
+          </div>
+          <div class="workout-meta-chips">
+            <span>⏱ ~50 min</span>
+            <span>🏋️ 6 Exercises</span>
+            <span>🗓 4 days ago</span>
+          </div>
+          <div class="exercise-preview-list">
+            <div class="exercise-item">1. Conventional Deadlift <span>3 Sets</span></div>
+            <div class="exercise-item">2. Lat Pulldown <span>4 Sets</span></div>
+            <div class="exercise-item">3. Seated Cable Row <span>3 Sets</span></div>
+            <div class="exercise-item">4. Face Pulls <span>4 Sets</span></div>
+            <div class="exercise-item">5. Incline Dumbbell Curl <span>3 Sets</span></div>
+            <div class="exercise-item">6. Hammer Curls <span>3 Sets</span></div>
+          </div>
+          <div class="workout-actions">
+            <button class="btn-toggle-details">Details</button>
+            <button class="btn-start-workout">
+              Start
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+        <!-- Legs Card -->
+        <article class="workout-item-card" data-category="legs">
+          <div class="workout-header">
+            <h3 class="workout-name">Legs & Core Destroy</h3>
+            <span class="badge" style="background: var(--accent-bg); color: var(--accent-dark);">Quads / Hamstrings</span>
+          </div>
+          <div class="workout-meta-chips">
+            <span>⏱ ~60 min</span>
+            <span>🏋️ 5 Exercises</span>
+            <span>🗓 Yesterday</span>
+          </div>
+          <div class="exercise-preview-list">
+            <div class="exercise-item">1. Barbell Back Squat <span>4 Sets</span></div>
+            <div class="exercise-item">2. Romanian Deadlift <span>3 Sets</span></div>
+            <div class="exercise-item">3. Walking Lunges <span>3 Sets</span></div>
+            <div class="exercise-item">4. Standing Calf Raises <span>4 Sets</span></div>
+            <div class="exercise-item">5. Hanging Leg Raises <span>3 Sets</span></div>
+          </div>
+          <div class="workout-actions">
+            <button class="btn-toggle-details">Details</button>
+            <button class="btn-start-workout">
+              Start
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+        <!-- Full Body Card -->
+        <article class="workout-item-card" data-category="full">
+          <div class="workout-header">
+            <h3 class="workout-name">Full Body Conditioning</h3>
+            <span class="badge" style="background: var(--accent-bg); color: var(--accent-dark);">Full Body</span>
+          </div>
+          <div class="workout-meta-chips">
+            <span>⏱ ~45 min</span>
+            <span>🏋️ 6 Exercises</span>
+            <span>🗓 1 week ago</span>
+          </div>
+          <div class="exercise-preview-list">
+            <div class="exercise-item">1. Goblet Squat <span>3 Sets</span></div>
+            <div class="exercise-item">2. Push-Ups <span>3 Sets</span></div>
+            <div class="exercise-item">3. Dumbbell Rows <span>3 Sets</span></div>
+            <div class="exercise-item">4. Dumbbell Shoulder Press <span>3 Sets</span></div>
+            <div class="exercise-item">5. KB Swings <span>3 Sets</span></div>
+            <div class="exercise-item">6. Plank <span>3 Sets</span></div>
+          </div>
+          <div class="workout-actions">
+            <button class="btn-toggle-details">Details</button>
+            <button class="btn-start-workout">
+              Start
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- 4. Workout Templates Section -->
+      <section class="card">
+        <div class="section-title">
+          Saved Templates
+          <span id="openModalFromSection">+ New</span>
+        </div>
+        <div class="templates-grid">
+          <div class="template-card">
+            <div class="template-title">5x5 Strength</div>
+            <div class="template-count">3 routines</div>
+          </div>
+          <div class="template-card">
+            <div class="template-title">PPL Split</div>
+            <div class="template-count">6 routines</div>
+          </div>
+          <div class="template-card">
+            <div class="template-title">Mobility & Core</div>
+            <div class="template-count">2 routines</div>
+          </div>
+          <div class="template-card">
+            <div class="template-title">HIIT Cardio</div>
+            <div class="template-count">4 routines</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 5. Floating Action Button -->
+    <button class="fab-btn" id="openModalFab">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>Create Workout</span>
+    </button>
+
+    <!-- 6. Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <!-- Interactive Create Workout Modal -->
+    <div class="modal-overlay" id="createModal">
+      <div class="modal-sheet" style="max-height: 85vh; overflow-y: auto;">
+        <div class="modal-header">
+          <h3 class="modal-title">Create Workout Routine</h3>
+          <button class="icon-btn" id="closeModalBtn" style="width: 32px; height: 32px;">✕</button>
+        </div>
+        <div class="modal-input-group" style="display: flex; flex-direction: column; gap: 10px;">
+          <input type="text" id="routineTitleInput" class="modal-input" placeholder="Routine Title (e.g. Push Day)">
+          <input type="text" id="routineMusclesInput" class="modal-input" placeholder="Target Muscle Groups (e.g. Chest, Shoulders, Triceps)">
+          <input type="number" id="routineDurationInput" class="modal-input" placeholder="Est. Duration (minutes)">
+          <textarea id="routineDescInput" class="modal-input" rows="3" placeholder="Workout Description (e.g., Chest, shoulders and triceps focused workout)" style="resize: vertical; font-family: inherit;"></textarea>
+          
+          <div style="background: var(--bg); padding: 12px; border-radius: 14px; box-shadow: var(--clay-shadow-inset);">
+            <label style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 6px;">Demonstration Video</label>
+            <input type="file" id="routineVideoFile" accept="video/*" class="modal-input" style="padding: 8px; font-size: 0.75rem;">
+            <input type="text" id="routineVideoUrl" class="modal-input" placeholder="Or paste Video URL" style="margin-top: 6px;">
+            
+            <div id="routineVideoPreviewBox" style="display: none; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; margin-top: 8px;">
+              <video id="routineVideoPlayer" controls style="width: 100%; height: 100%; object-fit: cover;"></video>
+            </div>
+          </div>
+        </div>
+        <button class="btn-start-workout" id="saveRoutineBtn" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; margin-top: 14px;">
+          Save Routine
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Search Drawer Toggle Interaction
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    const searchBarContainer = document.getElementById('searchBarContainer');
+    const searchInput = document.getElementById('searchInput');
+
+    searchToggleBtn.addEventListener('click', () => {
+      searchBarContainer.classList.toggle('open');
+      if (searchBarContainer.classList.contains('open')) {
+        searchInput.focus();
+      }
+    });
+
+    // Expandable Details Toggle Interaction
+    document.querySelectorAll('.btn-toggle-details').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.target.closest('.workout-item-card');
+        card.classList.toggle('expanded');
+        btn.textContent = card.classList.contains('expanded') ? 'Hide Details' : 'Details';
+      });
+    });
+
+    // Start Workout Navigation
+    document.querySelectorAll('.btn-start-workout').forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.location.href = 'activeworkout.html';
+      });
+    });
+
+    // Filter Tags Interaction
+    const tagBtns = document.querySelectorAll('.tag-btn');
+    const workoutCards = document.querySelectorAll('.workout-item-card');
+
+    tagBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tagBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+
+        workoutCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Search Filter Interaction
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      workoutCards.forEach(card => {
+        const title = card.querySelector('.workout-name').textContent.toLowerCase();
+        const exercises = card.querySelector('.exercise-preview-list').textContent.toLowerCase();
+        if (title.includes(query) || exercises.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Create Workout Modal & Video Preview Interactions
+    const modal = document.getElementById('createModal');
+    const openFab = document.getElementById('openModalFab');
+    const openSection = document.getElementById('openModalFromSection');
+    const closeModal = document.getElementById('closeModalBtn');
+    const saveBtn = document.getElementById('saveRoutineBtn');
+
+    const videoFileInput = document.getElementById('routineVideoFile');
+    const videoUrlInput = document.getElementById('routineVideoUrl');
+    const videoPreviewBox = document.getElementById('routineVideoPreviewBox');
+    const videoPlayer = document.getElementById('routineVideoPlayer');
+
+    videoFileInput?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        videoPlayer.src = url;
+        videoPreviewBox.style.display = 'block';
+      }
+    });
+
+    videoUrlInput?.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url) {
+        videoPlayer.src = url;
+        videoPreviewBox.style.display = 'block';
+      }
+    });
+
+    const toggleModal = (show) => {
+      if (show) modal.classList.add('active');
+      else modal.classList.remove('active');
+    };
+
+    openFab.addEventListener('click', () => toggleModal(true));
+    openSection.addEventListener('click', () => toggleModal(true));
+    closeModal.addEventListener('click', () => toggleModal(false));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) toggleModal(false);
+    });
+
+    saveBtn.addEventListener('click', () => {
+      alert('🎉 New workout routine created successfully with demonstration video & description!');
+      toggleModal(false);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Leaderboard</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --gold: #f59e0b;
+      --silver: #94a3b8;
+      --bronze: #d97706;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* App Chassis */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 150px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .season-badge {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .season-badge span {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+    }
+
+    /* 2. Ranking Tabs */
+    .tabs-wrapper {
+      padding: 0 20px 16px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tabs-container {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(42, 130, 228, 0.4);
+    }
+
+    /* 3. Top 3 Podiums */
+    .podium-container {
+      padding: 10px 20px 20px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .podium-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 14px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .podium-card.rank-1 {
+      padding-top: 20px;
+      padding-bottom: 20px;
+      border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .crown-icon {
+      position: absolute;
+      top: -12px;
+      font-size: 1.2rem;
+    }
+
+    .avatar-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .rank-1 .avatar-box {
+      width: 52px;
+      height: 52px;
+      font-size: 1.1rem;
+      background: #fef3c7;
+      color: var(--gold);
+    }
+
+    .rank-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -18px;
+      margin-bottom: 8px;
+    }
+
+    .badge-1 { background: var(--gold); }
+    .badge-2 { background: var(--silver); }
+    .badge-3 { background: var(--bronze); }
+
+    .podium-user {
+      font-size: 0.8rem;
+      font-weight: 800;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .podium-score {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    /* Algorithm Metas Info Banner */
+    .criteria-info {
+      margin: 0 20px 16px 20px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* 4. Main Leaderboard List */
+    .leaderboard-list {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-row {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rank-num {
+      width: 24px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .username {
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .score-val {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .rank-change {
+      font-size: 0.68rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .change-up { color: #10b981; }
+    .change-down { color: #ef4444; }
+    .change-same { color: var(--text-muted); }
+
+    /* 6. User Personal Ranking Sticky Card */
+    .user-rank-sticky {
+      position: fixed;
+      bottom: 74px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 390px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(30, 41, 59, 0.4);
+      z-index: 90;
+    }
+
+    .user-rank-sticky .rank-num {
+      color: #ffffff;
+    }
+
+    .user-rank-sticky .username {
+      color: #ffffff;
+    }
+
+    .user-rank-sticky .score-val {
+      color: var(--accent-light);
+    }
+
+    .user-rank-sticky .rank-change {
+      color: #a7f3d0;
+    }
+
+    /* 7. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header -->
+    <header class="header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="index.html" style="text-decoration: none; color: var(--accent-dark); font-weight: 800; font-size: 1.2rem;">←</a>
+        <h1 class="title">Leaderboard</h1>
+      </div>
+      <div class="season-badge">
+        <span></span> Season 4 (Aug)
+      </div>
+    </header>
+
+    <!-- 2. Category Tabs -->
+    <div class="tabs-wrapper">
+      <div class="tabs-container">
+        <button class="tab-btn active" data-category="overall">Overall</button>
+        <button class="tab-btn" data-category="steps">👟 Steps</button>
+        <button class="tab-btn" data-category="calories">🔥 Calories</button>
+        <button class="tab-btn" data-category="volume">🏋️ Volume</button>
+        <button class="tab-btn" data-category="consistency">⚡ Consistency</button>
+      </div>
+    </div>
+
+    <!-- 3. Top 3 Section -->
+    <section class="podium-container" id="podiumSection">
+      
+      <!-- Rank #2 -->
+      <div class="podium-card rank-2">
+        <div class="avatar-box">MK</div>
+        <div class="rank-badge badge-2">2</div>
+        <div class="podium-user" id="p2User">MaxK_99</div>
+        <div class="podium-score" id="p2Score">9,420 pts</div>
+      </div>
+
+      <!-- Rank #1 -->
+      <div class="podium-card rank-1">
+        <div class="crown-icon">👑</div>
+        <div class="avatar-box">AR</div>
+        <div class="rank-badge badge-1">1</div>
+        <div class="podium-user" id="p1User">AlexR_Fit</div>
+        <div class="podium-score" id="p1Score">9,850 pts</div>
+      </div>
+
+      <!-- Rank #3 -->
+      <div class="podium-card rank-3">
+        <div class="avatar-box">SL</div>
+        <div class="rank-badge badge-3">3</div>
+        <div class="podium-user" id="p3User">SarahLifts</div>
+        <div class="podium-score" id="p3Score">9,180 pts</div>
+      </div>
+
+    </section>
+
+    <!-- Category Explainer -->
+    <div class="criteria-info" id="criteriaExplainer">
+      ⚙️ Overall rank calculated via 10 metrics: Consistency, Strength, Volume, Frequency, PRs, Progress, Streak, Performance, Goals & Discipline.
+    </div>
+
+    <!-- 4. Main Leaderboard List -->
+    <main class="leaderboard-list" id="leaderboardList">
+      <!-- Dynamically populated list rows -->
+    </main>
+
+    <!-- 6. Your Personal Ranking Sticky Card -->
+    <div class="user-rank-sticky">
+      <div class="rank-num" id="userStickyRank">#24</div>
+      <div class="user-info">
+        <div class="username">You (Alex)</div>
+        <div class="rank-change" id="userStickySub">▲ 3 spots this week</div>
+      </div>
+      <div class="score-val" id="userStickyScore">8,450 steps</div>
+    </div>
+
+    <!-- 7. Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="app-state.js"></script>
+  <script>
+    const LEADERBOARD_DATA = {
+      overall: {
+        explainer: "⚙️ Overall rank calculated via 10 metrics: Consistency, Strength, Volume, Frequency, PRs, Progress, Streak, Performance, Goals & Discipline.",
+        podium: [
+          { name: "AlexR_Fit", score: "9,850 pts" },
+          { name: "MaxK_99", score: "9,420 pts" },
+          { name: "SarahLifts", score: "9,180 pts" }
+        ],
+        rows: [
+          { rank: 4, name: "IronPioneer", change: "▲ 2 positions", score: "8,940 pts" },
+          { rank: 5, name: "TitanMode", change: "▼ 1 position", score: "8,810 pts" },
+          { rank: 6, name: "GritAndGain", change: "➖ Same", score: "8,650 pts" },
+          { rank: 7, name: "PowerCircuit", change: "▲ 4 positions", score: "8,420 pts" },
+          { rank: 8, name: "ApexAthlete", change: "▼ 2 positions", score: "8,300 pts" },
+          { rank: 9, name: "RepCounter_X", change: "➖ Same", score: "8,150 pts" },
+          { rank: 10, name: "PulseRider", change: "▲ 1 position", score: "7,980 pts" }
+        ],
+        userRank: "#14",
+        getUserScore: (state) => `${state.dailySteps > 8000 ? "8,450" : "7,450"} pts`
+      },
+
+      steps: {
+        explainer: "👟 Ranked by total steps tracked throughout the entire day.",
+        podium: [
+          { name: "AlexR_Fit", score: "14,250 steps" },
+          { name: "Ryan_Cross", score: "13,820 steps" },
+          { name: "Sam_Runner", score: "12,940 steps" }
+        ],
+        rows: [
+          { rank: 4, name: "Emma_Walks", change: "▲ 3 positions", score: "11,850 steps" },
+          { rank: 5, name: "TitanMode", change: "➖ Same", score: "10,920 steps" },
+          { rank: 6, name: "GritAndGain", change: "▼ 1 position", score: "10,400 steps" },
+          { rank: 7, name: "PowerCircuit", change: "▲ 2 positions", score: "9,850 steps" },
+          { rank: 8, name: "ApexAthlete", change: "▼ 1 position", score: "9,210 steps" },
+          { rank: 9, name: "IronPioneer", change: "➖ Same", score: "8,950 steps" },
+          { rank: 10, name: "PulseRider", change: "▲ 5 positions", score: "8,600 steps" }
+        ],
+        userRank: "#24",
+        getUserScore: (state) => state.stepTrackingEnabled ? `${(state.dailySteps || 8450).toLocaleString()} steps` : "Step Tracking Off"
+      },
+
+      calories: {
+        explainer: "🔥 Ranked by total daily active calories burned across all daily movement.",
+        podium: [
+          { name: "AlexR_Fit", score: "1,280 kcal" },
+          { name: "Ryan_Cross", score: "1,190 kcal" },
+          { name: "Sam_Runner", score: "1,140 kcal" }
+        ],
+        rows: [
+          { rank: 4, name: "TitanMode", change: "▲ 1 position", score: "980 kcal" },
+          { rank: 5, name: "MaxK_99", change: "▼ 2 positions", score: "910 kcal" },
+          { rank: 6, name: "IronPioneer", change: "▲ 4 positions", score: "850 kcal" },
+          { rank: 7, name: "GritAndGain", change: "➖ Same", score: "790 kcal" },
+          { rank: 8, name: "PowerCircuit", change: "▼ 1 position", score: "720 kcal" },
+          { rank: 9, name: "ApexAthlete", change: "➖ Same", score: "680 kcal" },
+          { rank: 10, name: "PulseRider", change: "▲ 2 positions", score: "630 kcal" }
+        ],
+        userRank: "#18",
+        getUserScore: (state) => state.activityCaloriesEnabled ? `${state.dailyCalories || 520} kcal` : "Activity Calories — Off"
+      },
+
+      volume: {
+        explainer: "🏋️ Ranked by cumulative training volume (kg lifted) this month.",
+        podium: [
+          { name: "AlexR_Fit", score: "62,450 kg" },
+          { name: "Ryan_Cross", score: "59,820 kg" },
+          { name: "Sam_Runner", score: "57,210 kg" }
+        ],
+        rows: [
+          { rank: 4, name: "TitanMode", change: "▲ 2 positions", score: "52,400 kg" },
+          { rank: 5, name: "IronPioneer", change: "▼ 1 position", score: "48,900 kg" },
+          { rank: 6, name: "MaxK_99", change: "➖ Same", score: "45,300 kg" },
+          { rank: 7, name: "PowerCircuit", change: "▲ 3 positions", score: "41,800 kg" },
+          { rank: 8, name: "GritAndGain", change: "▼ 2 positions", score: "38,500 kg" },
+          { rank: 9, name: "ApexAthlete", change: "➖ Same", score: "35,200 kg" },
+          { rank: 10, name: "PulseRider", change: "▲ 1 position", score: "32,100 kg" }
+        ],
+        userRank: "#8",
+        getUserScore: () => "38,420 kg"
+      },
+
+      consistency: {
+        explainer: "⚡ Ranked by monthly workout schedule adherence rate (%).",
+        podium: [
+          { name: "AlexR_Fit", score: "96% optimal" },
+          { name: "Ryan_Cross", score: "94% optimal" },
+          { name: "Sam_Runner", score: "92% optimal" }
+        ],
+        rows: [
+          { rank: 4, name: "IronPioneer", change: "▲ 1 position", score: "90%" },
+          { rank: 5, name: "TitanMode", change: "➖ Same", score: "88%" },
+          { rank: 6, name: "MaxK_99", change: "▼ 2 positions", score: "85%" },
+          { rank: 7, name: "GritAndGain", change: "▲ 2 positions", score: "82%" },
+          { rank: 8, name: "PowerCircuit", change: "▼ 1 position", score: "80%" },
+          { rank: 9, name: "ApexAthlete", change: "➖ Same", score: "78%" },
+          { rank: 10, name: "PulseRider", change: "▲ 3 positions", score: "75%" }
+        ],
+        userRank: "#5",
+        getUserScore: () => "88% optimal"
+      }
+    };
+
+    function renderLeaderboard(category) {
+      const data = LEADERBOARD_DATA[category] || LEADERBOARD_DATA.overall;
+      const state = GymState.get();
+
+      // Explainer
+      document.getElementById('criteriaExplainer').textContent = data.explainer;
+
+      // Podiums
+      document.getElementById('p1User').textContent = data.podium[0].name;
+      document.getElementById('p1Score').textContent = data.podium[0].score;
+
+      document.getElementById('p2User').textContent = data.podium[1].name;
+      document.getElementById('p2Score').textContent = data.podium[1].score;
+
+      document.getElementById('p3User').textContent = data.podium[2].name;
+      document.getElementById('p3Score').textContent = data.podium[2].score;
+
+      // List rows
+      const listContainer = document.getElementById('leaderboardList');
+      listContainer.innerHTML = data.rows.map(r => `
+        <div class="list-row">
+          <div class="rank-num">${r.rank}</div>
+          <div class="user-info">
+            <div class="username">${r.name}</div>
+            <div class="rank-change ${r.change.includes('▲') ? 'change-up' : r.change.includes('▼') ? 'change-down' : 'change-same'}">${r.change}</div>
+          </div>
+          <div class="score-val">${r.score}</div>
+        </div>
+      `).join('');
+
+      // User sticky bar
+      document.getElementById('userStickyRank').textContent = data.userRank;
+      document.getElementById('userStickyScore').textContent = data.getUserScore(state);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderLeaderboard('overall');
+
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const cat = tab.dataset.category;
+          renderLeaderboard(cat);
+        });
+      });
+
+      window.addEventListener('appStateChanged', () => {
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) renderLeaderboard(activeTab.dataset.category);
+      });
+    });
+  </script>
+
+</body>
+</html>

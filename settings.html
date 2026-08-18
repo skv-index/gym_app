@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Settings</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --danger: #ef4444;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 100px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 20px 20px 10px 20px;
+    }
+
+    /* Settings Group Card */
+    .settings-group {
+      margin: 0 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 6px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px stroke rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .setting-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .setting-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .setting-value {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .setting-value svg {
+      stroke: currentColor;
+    }
+
+    /* Claymorphic Switch Toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Color Swatch Picker */
+    .color-picker {
+      display: flex;
+      gap: 8px;
+    }
+
+    .color-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .color-dot.active {
+      border-color: var(--text-main);
+      transform: scale(1.15);
+    }
+
+    /* Action Links (Destructive or Interactive) */
+    .danger-label {
+      color: var(--danger) !important;
+    }
+
+    /* 7. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header -->
+    <header class="header">
+      <h1 class="title">Settings</h1>
+    </header>
+
+    <!-- 2. Workout Section -->
+    <div class="section-title">Workout</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Default Rest Timer</span>
+          <span class="setting-desc">Auto-start rest timer between sets</span>
+        </div>
+        <span class="setting-value">
+          90 sec
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Weight Unit</span>
+          <span class="setting-desc">Preferred unit of measurement</span>
+        </div>
+        <span class="setting-value">
+          kg
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Rep Preferences</span>
+          <span class="setting-desc">Default targets and step sizes</span>
+        </div>
+        <span class="setting-value">
+          Standard
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Workout Reminders</span>
+          <span class="setting-desc">Schedule daily training alerts</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 2b. Activity Tracking Section -->
+    <div class="section-title">Activity Tracking</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Step Tracking</span>
+          <span class="setting-desc">Automatically track steps throughout the day</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="stepTrackingToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Daily Step Goal</span>
+          <span class="setting-desc">Target steps per day</span>
+        </div>
+        <select id="stepGoalSelect" style="background: var(--bg); border: none; padding: 6px 10px; border-radius: 10px; font-weight: 800; color: var(--accent-dark); cursor: pointer;">
+          <option value="5000">5,000 steps</option>
+          <option value="7500">7,500 steps</option>
+          <option value="10000">10,000 steps</option>
+          <option value="12500">12,500 steps</option>
+          <option value="15000">15,000 steps</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Activity Calories</span>
+          <span class="setting-desc">Track daily active calories burned</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="caloriesTrackingToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 3. Appearance Section -->
+    <div class="section-title">Appearance</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Dark Mode</span>
+          <span class="setting-desc">Switch dark / light visual theme</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Accent Color</span>
+          <span class="setting-desc">Customize UI accent theme</span>
+        </div>
+        <div class="color-picker">
+          <div class="color-dot active" style="background: #2a82e4;"></div>
+          <div class="color-dot" style="background: #10b981;"></div>
+          <div class="color-dot" style="background: #8b5cf6;"></div>
+          <div class="color-dot" style="background: #f59e0b;"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Haptic Feedback</span>
+          <span class="setting-desc">Vibrate on set & rest completions</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 4. Notifications Section -->
+    <div class="section-title">Notifications</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Workout Reminders</span>
+          <span class="setting-desc">Scheduled training notifications</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Goal Reminders</span>
+          <span class="setting-desc">Progress checks and deadline alerts</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Personal Record Alerts</span>
+          <span class="setting-desc">Celebrate when breaking new PRs</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 5. Data Section -->
+    <div class="section-title">Data</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Export Data</span>
+          <span class="setting-desc">Download backup in CSV or JSON</span>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Import Data</span>
+          <span class="setting-desc">Restore workouts from file</span>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      </div>
+
+      <div class="setting-item" onclick="confirmClearHistory()">
+        <div class="setting-info">
+          <span class="setting-label danger-label">Clear Workout History</span>
+          <span class="setting-desc">Permanently erase all logged sets</span>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </div>
+    </div>
+
+    <!-- 6. About Section -->
+    <div class="section-title">About</div>
+    <div class="settings-group">
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">App Version</span>
+          <span class="setting-desc">v2.4.0 (Build 2026.8)</span>
+        </div>
+        <span class="setting-value" style="color: var(--text-muted); font-size: 0.78rem;">Up to date</span>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Privacy Policy</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <span class="setting-label">Terms of Service</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </div>
+    </div>
+
+    <!-- 7. Bottom Navigation (Settings Active) -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="app-state.js"></script>
+  <script>
+    // Initialize UI from Shared App State
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = GymState.get();
+      const stepToggle = document.getElementById('stepTrackingToggle');
+      const goalSelect = document.getElementById('stepGoalSelect');
+      const calToggle = document.getElementById('caloriesTrackingToggle');
+
+      if (stepToggle) stepToggle.checked = state.stepTrackingEnabled;
+      if (goalSelect) goalSelect.value = state.dailyStepGoal || 10000;
+      if (calToggle) calToggle.checked = state.activityCaloriesEnabled;
+
+      stepToggle?.addEventListener('change', (e) => {
+        GymState.update({ stepTrackingEnabled: e.target.checked });
+      });
+
+      goalSelect?.addEventListener('change', (e) => {
+        GymState.update({ dailyStepGoal: parseInt(e.target.value) });
+      });
+
+      calToggle?.addEventListener('change', (e) => {
+        GymState.update({ activityCaloriesEnabled: e.target.checked });
+      });
+    });
+
+    // Color Swatch Selection Interactivity
+    const dots = document.querySelectorAll('.color-dot');
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        dots.forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+    });
+
+    // Clear History Alert Prompt
+    function confirmClearHistory() {
+      if (confirm("Are you sure you want to clear your entire workout history? This action cannot be undone.")) {
+        alert("Workout history cleared successfully.");
+      }
+    }
+  </script>
+
+</body>
+</html>

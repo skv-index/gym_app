@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Statistics</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 100px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .period-selector {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 20px 12px 20px;
+    }
+
+    /* 2. Overview Metrics Grid */
+    .overview-grid {
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .metric-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-card.full-width {
+      grid-column: span 2;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .metric-sub {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #10b981;
+    }
+
+    /* Cards & Chart Wrappers */
+    .chart-card {
+      margin: 0 20px;
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .chart-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* Visual Bars Container */
+    .bar-chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 110px;
+      padding-top: 10px;
+      gap: 8px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-wrapper {
+      width: 100%;
+      max-width: 24px;
+      height: 100%;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, var(--accent-light), var(--accent));
+      border-radius: 8px;
+      transition: height 0.4s ease;
+    }
+
+    .bar-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Line Chart SVG Visual Treatment */
+    .line-chart-svg {
+      width: 100%;
+      height: 90px;
+      overflow: visible;
+    }
+
+    /* 6. Muscle Group Distribution */
+    .muscle-dist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dist-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dist-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .dist-bar-track {
+      height: 8px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dist-bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      background: var(--accent);
+    }
+
+    /* 7. Personal Records Section */
+    .pr-card-grid {
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .pr-box {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .pr-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 4px;
+    }
+
+    .pr-sub {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 8. Insights Cards */
+    .insights-container {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .insight-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .insight-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-bg);
+      color: var(--accent-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .insight-text {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    /* 9. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header -->
+    <header class="header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <a href="progress.html" style="text-decoration: none; color: var(--accent-dark); font-weight: 800; font-size: 1.2rem;">←</a>
+        <h1 class="title">Statistics</h1>
+      </div>
+      <select class="period-selector">
+        <option>This Month</option>
+        <option>Last 30 Days</option>
+        <option>Last 3 Months</option>
+        <option>This Year</option>
+      </select>
+    </header>
+
+    <!-- 2. Overview Metrics -->
+    <div class="section-title">Overview</div>
+    <section class="overview-grid">
+      <div class="metric-card">
+        <span class="metric-label">Total Workouts</span>
+        <span class="metric-value">18</span>
+        <span class="metric-sub">▲ +12% vs last month</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Total Volume</span>
+        <span class="metric-value">124.5k kg</span>
+        <span class="metric-sub">▲ +14% overall</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Total Sets</span>
+        <span class="metric-value">216</span>
+        <span class="metric-sub">Avg 12 / workout</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Total Reps</span>
+        <span class="metric-value">2,140</span>
+        <span class="metric-sub">Avg 10 / set</span>
+      </div>
+      <div class="metric-card full-width">
+        <div>
+          <div class="metric-label">Avg Duration</div>
+          <div class="metric-value">58 mins</div>
+        </div>
+        <div style="text-align: right;">
+          <span class="metric-sub" style="color: var(--text-muted);">Optimal Zone</span>
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent);">45–60 min range</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Training Frequency Chart -->
+    <div class="section-title">Training Frequency</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Workouts per Week</span>
+        <span class="chart-badge">4.5 avg / wk</span>
+      </div>
+      <div class="bar-chart-container">
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 75%;"></div></div>
+          <span class="bar-label">W1</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 100%;"></div></div>
+          <span class="bar-label">W2</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 80%;"></div></div>
+          <span class="bar-label">W3</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 90%;"></div></div>
+          <span class="bar-label">W4</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Volume Chart -->
+    <div class="section-title">Volume Progression</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Weekly Load (kg)</span>
+        <span class="chart-badge">31,125 kg avg</span>
+      </div>
+      <svg class="line-chart-svg" viewBox="0 0 300 90">
+        <path d="M 10 70 Q 75 50, 100 40 T 190 30 T 290 15" fill="none" stroke="var(--accent-light)" stroke-width="3" />
+        <path d="M 10 70 Q 75 50, 100 40 T 190 30 T 290 15 L 290 90 L 10 90 Z" fill="rgba(42, 130, 228, 0.15)" />
+        <circle cx="10" cy="70" r="4" fill="var(--accent)" />
+        <circle cx="100" cy="40" r="4" fill="var(--accent)" />
+        <circle cx="190" cy="30" r="4" fill="var(--accent)" />
+        <circle cx="290" cy="15" r="5" fill="var(--accent-dark)" />
+      </svg>
+    </div>
+
+    <!-- 5. Strength Chart -->
+    <div class="section-title">Strength Index (1RM Estimated)</div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Bench Press 1RM</span>
+        <span class="chart-badge">+5 kg this month</span>
+      </div>
+      <div class="bar-chart-container">
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 60%;"></div></div>
+          <span class="bar-label">95kg</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 70%;"></div></div>
+          <span class="bar-label">97.5kg</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 85%;"></div></div>
+          <span class="bar-label">100kg</span>
+        </div>
+        <div class="bar-col">
+          <div class="bar-wrapper"><div class="bar-fill" style="height: 100%;"></div></div>
+          <span class="bar-label">102.5kg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Muscle Group Distribution -->
+    <div class="section-title">Muscle Group Distribution</div>
+    <div class="chart-card">
+      <div class="muscle-dist-list">
+        
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Chest</span>
+            <span>28%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 28%; background: var(--accent);"></div></div>
+        </div>
+
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Back</span>
+            <span>24%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 24%; background: var(--accent-light);"></div></div>
+        </div>
+
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Legs</span>
+            <span>20%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 20%; background: #10b981;"></div></div>
+        </div>
+
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Shoulders</span>
+            <span>14%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 14%; background: #f59e0b;"></div></div>
+        </div>
+
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Arms</span>
+            <span>10%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 10%; background: #8b5cf6;"></div></div>
+        </div>
+
+        <div class="dist-row">
+          <div class="dist-meta">
+            <span>Core</span>
+            <span>4%</span>
+          </div>
+          <div class="dist-bar-track"><div class="dist-bar-fill" style="width: 4%; background: #ec4899;"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 7. Personal Records -->
+    <div class="section-title">Personal Records</div>
+    <section class="pr-card-grid">
+      <div class="pr-box">
+        <div class="metric-label">Total PRs Hit</div>
+        <div class="pr-val">12 PRs</div>
+        <div class="pr-sub">This month</div>
+      </div>
+      <div class="pr-box">
+        <div class="metric-label">PR Trend</div>
+        <div class="pr-val" style="color: #10b981;">▲ Strong</div>
+        <div class="pr-sub">+3 vs last month</div>
+      </div>
+      <div class="pr-box" style="grid-column: span 2;">
+        <div class="metric-label">Best Recent Performance</div>
+        <div class="pr-val">Bench Press — 102.5 kg × 3 reps</div>
+        <div class="pr-sub">Achieved on August 18, 2026</div>
+      </div>
+    </section>
+
+    <!-- 8. Insights Section -->
+    <div class="section-title">AI Analytics Insights</div>
+    <section class="insights-container">
+      
+      <div class="insight-card">
+        <div class="insight-icon">📈</div>
+        <div class="insight-text">
+          Your overall training volume increased <strong>14%</strong> this month, showing progressive overload.
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-text">
+          Chest and Back receive <strong>52%</strong> of total volume. Consider adding 1 more Leg exercise for balance.
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">⚡</div>
+        <div class="insight-text">
+          Workout consistency is at an all-time high with an average of <strong>4.5 sessions/week</strong>.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 9. Bottom Navigation (Progress Active) -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+</body>
+</html>

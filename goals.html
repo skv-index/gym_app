@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Goals</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #eaf2fb;
+      --card-bg: #f4f8fe;
+      --accent: #2a82e4;
+      --accent-light: #52a0fd;
+      --accent-dark: #1263c3;
+      --accent-bg: #dcebfe;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+
+      /* Claymorphism Shadows */
+      --clay-shadow-card: 
+        12px 12px 24px #c2d4ea, 
+        -12px -12px 24px #ffffff,
+        inset 2px 2px 4px rgba(255, 255, 255, 0.8),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.03);
+
+      --clay-shadow-inset:
+        inset 4px 4px 8px #c5d7ed,
+        inset -4px -4px 8px #ffffff;
+
+      --clay-shadow-float:
+        8px 12px 20px rgba(42, 130, 228, 0.35),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* 1. Header */
+    .header {
+      padding: 24px 20px 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .add-goal-btn {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(42, 130, 228, 0.35);
+      transition: transform 0.15s ease;
+    }
+
+    .add-goal-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 12px 20px 12px 20px;
+    }
+
+    /* 2 & 3. Goal Cards Section */
+    .goals-list {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .goal-card {
+      background: var(--card-bg);
+      box-shadow: var(--clay-shadow-card);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .goal-cat {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .goal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    .status-chip {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .status-on-track {
+      background: #dcebfe;
+      color: var(--accent-dark);
+    }
+
+    .status-ahead {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .status-done {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* Values & Progress Bar */
+    .progress-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .val-text {
+      color: var(--text-main);
+    }
+
+    .pct-text {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .progress-bar-track {
+      height: 10px;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-light), var(--accent));
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 6px;
+      border-top: 1px stroke rgba(0,0,0,0.03);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* 4. Completed Section styling overrides */
+    .completed-card {
+      opacity: 0.85;
+    }
+
+    .completed-card .progress-bar-fill {
+      background: #10b981;
+    }
+
+    /* 5. Create Goal Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30, 41, 59, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      border-radius: 28px 28px 0 0;
+      padding: 24px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Modal Form Elements */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .cat-btn {
+      padding: 10px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: 2px solid transparent;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-btn.selected {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      box-shadow: var(--clay-shadow-inset);
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: var(--clay-shadow-float);
+    }
+
+    /* 6. Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: var(--card-bg);
+      box-shadow: 0 -8px 20px rgba(194, 212, 234, 0.6);
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 0 22px 0;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- 1. Header -->
+    <header class="header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="index.html" style="text-decoration: none; color: var(--accent-dark); font-weight: 800; font-size: 1.2rem;">←</a>
+        <h1 class="title">Goals</h1>
+      </div>
+      <button class="add-goal-btn" id="openModalBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add Goal
+      </button>
+    </header>
+
+    <!-- 2. Active Goals -->
+    <div class="section-title">Active Goals</div>
+
+    <main class="goals-list">
+
+      <!-- Strength Goal Card -->
+      <article class="goal-card">
+        <div class="card-top">
+          <div>
+            <div class="goal-cat">Strength</div>
+            <h3 class="goal-title">Bench Press — 80 kg</h3>
+          </div>
+          <span class="status-chip status-on-track">On Track</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="val-text">72.5 kg / 80 kg</span>
+            <span class="pct-text">91%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: 91%;"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Target Date: Sep 30, 2026</span>
+          <span>7.5 kg remaining</span>
+        </div>
+      </article>
+
+      <!-- Consistency Goal Card -->
+      <article class="goal-card">
+        <div class="card-top">
+          <div>
+            <div class="goal-cat">Consistency</div>
+            <h3 class="goal-title">Train 4× per week</h3>
+          </div>
+          <span class="status-chip status-ahead">Ahead</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="val-text">3 of 4 workouts done</span>
+            <span class="pct-text">75%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: 75%;"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Weekly Reset: Sunday</span>
+          <span>1 session left</span>
+        </div>
+      </article>
+
+      <!-- Streak Goal Card -->
+      <article class="goal-card">
+        <div class="card-top">
+          <div>
+            <div class="goal-cat">Streak</div>
+            <h3 class="goal-title">30-day streak</h3>
+          </div>
+          <span class="status-chip status-on-track">On Track</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="val-text">18 days active</span>
+            <span class="pct-text">60%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: 60%;"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Target Date: Sep 01, 2026</span>
+          <span>12 days to go</span>
+        </div>
+      </article>
+
+      <!-- Volume Goal Card -->
+      <article class="goal-card">
+        <div class="card-top">
+          <div>
+            <div class="goal-cat">Volume</div>
+            <h3 class="goal-title">50,000 kg monthly volume</h3>
+          </div>
+          <span class="status-chip status-on-track">On Track</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="val-text">29,450 kg / 50,000 kg</span>
+            <span class="pct-text">59%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: 59%;"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Monthly Reset: Aug 31</span>
+          <span>20,550 kg remaining</span>
+        </div>
+      </article>
+
+    </main>
+
+    <!-- 4. Completed Goals -->
+    <div class="section-title" style="margin-top: 24px;">Completed Goals</div>
+
+    <div class="goals-list">
+
+      <article class="goal-card completed-card">
+        <div class="card-top">
+          <div>
+            <div class="goal-cat" style="color: #10b981;">Personal Record</div>
+            <h3 class="goal-title">Barbell Squat — 120 kg</h3>
+          </div>
+          <span class="status-chip status-done">Achieved</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-meta">
+            <span class="val-text">120 kg / 120 kg</span>
+            <span class="pct-text" style="color: #10b981;">100%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Completed on Aug 14, 2026</span>
+          <span>🏆 Verified PR</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- 5. Create Goal Modal -->
+    <div class="modal-overlay" id="goalModal">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title">Create New Goal</h3>
+          <button class="modal-close-btn" id="closeModalBtn">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Category</label>
+          <div class="category-grid">
+            <div class="cat-btn selected">Strength</div>
+            <div class="cat-btn">Weight/Reps</div>
+            <div class="cat-btn">Consistency</div>
+            <div class="cat-btn">Streak</div>
+            <div class="cat-btn">Volume</div>
+            <div class="cat-btn">Personal Record</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Goal Title</label>
+          <input type="text" class="input-field" placeholder="e.g., Overhead Press 60kg">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Value</label>
+          <input type="text" class="input-field" placeholder="e.g., 60 kg or 4 days/week">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Deadline</label>
+          <input type="date" class="input-field" value="2026-09-30">
+        </div>
+
+        <button class="submit-btn" id="saveGoalBtn">Save Goal</button>
+      </div>
+    </div>
+
+    <!-- 6. Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>Home</span>
+      </a>
+      <a href="workouts.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>Workouts</span>
+      </a>
+      <a href="progress.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span>Progress</span>
+      </a>
+      <a href="exercise-library.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Library</span>
+      </a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    // Modal Interaction
+    const modal = document.getElementById('goalModal');
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const saveBtn = document.getElementById('saveGoalBtn');
+
+    openBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    saveBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+
+    // Category Selector
+    const catBtns = document.querySelectorAll('.cat-btn');
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  </script>
+
+</body>
+</html>
